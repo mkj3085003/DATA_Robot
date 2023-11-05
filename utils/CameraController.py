@@ -3,7 +3,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import GrabSim_pb2
-from SceneManager import SceneManager
+from utils.SceneManager import SceneManager
 
 class CameraController:
     def __init__(self, scene_manager):

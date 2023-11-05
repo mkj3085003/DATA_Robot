@@ -1,7 +1,7 @@
 import GrabSim_pb2
 import time
 
-from SceneManager import SceneManager
+from utils.SceneManager import SceneManager
 
 class JointController:
     def __init__(self, scene_manager):

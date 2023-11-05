@@ -2,9 +2,6 @@ import sys
 import time
 import grpc
 
-sys.path.append('./')
-sys.path.append('../')
-
 import GrabSim_pb2_grpc
 import GrabSim_pb2
 
@@ -35,6 +32,26 @@ class SceneManager:
         # Get environment information for the specified scene
         scene = self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
         return scene
+    
+    def show_env_info(self,scene_id=0):
+        scene = self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
+        print('------------------show_env_info----------------------')
+        print(
+            f"location:{[scene.location.X, scene.location.Y]}, rotation:{scene.rotation.Yaw}\n",
+            f"joints number:{len(scene.joints)}, fingers number:{len(scene.fingers)}\n", f"objects number: {len(scene.objects)}\n"
+            f"rotation:{scene.rotation}, timestep:{scene.timestep}\n"
+            f"timestamp:{scene.timestamp}, collision:{scene.collision}, info:{scene.info}")
+
+    '''
+    return 
+    (X, Y,Yaw(deg))         
+    '''
+    def get_robo_pose(self,scene_id=0):
+        scene =  self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
+        return scene.location.X,scene.location.Y,(scene.rotation.Yaw)
+
+
+
 
 # if __name__ == '__main__':
 #     # Create an instance of the SceneManager class

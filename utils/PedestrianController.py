@@ -1,7 +1,7 @@
 import GrabSim_pb2
 import time
 
-from SceneManager import SceneManager
+from utils.SceneManager import SceneManager
 class PedestrianController:
     def __init__(self, scene_manager):
         # Set up the gRPC channel and client
