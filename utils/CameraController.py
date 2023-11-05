@@ -17,8 +17,23 @@ class CameraController:
     def show_image(self, img_data):
         im = img_data.images[0]
         d = np.frombuffer(im.data, dtype=im.dtype).reshape((im.height, im.width, im.channels))
-        plt.imshow(d, cmap="gray" if "depth" in im.name.lower() else None)
+      
+        if 'depth' in im.name.lower():
+            plt.imshow(d, cmap="gray",vmin=0,vmax=d.max())
+            plt.colorbar()  # 添加颜色条
+        else :
+            plt.imshow(d)
         plt.show()
+
+    def save_image(self, img_data):
+        im = img_data.images[0]
+        d = np.frombuffer(im.data, dtype=im.dtype).reshape((im.height, im.width, im.channels))
+        if 'depth' in im.name.lower():
+            plt.imshow(d, cmap="gray",vmin=0,vmax=600)
+            plt.colorbar()  # 添加颜色条
+        else :
+            plt.imshow(d)
+        plt.savefig(im.name+".png")
 
 if __name__ == '__main__':
     scene_manager = SceneManager()
@@ -40,7 +55,7 @@ if __name__ == '__main__':
     # 选择要测试的相机(也可以是一个列表，同时返回多个)
     # camera_name = GrabSim_pb2.CameraName.Head_Color
     # camera_name = GrabSim_pb2.CameraName.Head_Depth
-    camera_name = GrabSim_pb2.CameraName.Head_Segment
+    camera_name = GrabSim_pb2.CameraName.Head_Depth
     # 获取相机图像
     img_data = camera_controller.capture_image(camera_name)
 

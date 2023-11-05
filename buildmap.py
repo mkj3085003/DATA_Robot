@@ -5,7 +5,7 @@ import GrabSim_pb2
 from utils.SceneManager import SceneManager
 from utils.CameraController import CameraController
 from utils.NavigationController import NavigationController
-from map.map_builder import Semantic_Mapping
+from map.MapBuilder import MapBuilder,show_pointcloud
 import map.depth_utils as du
 import threading
 import argparse
@@ -85,7 +85,7 @@ def get_args():
                         help="dataset split (train | val | val_mini | TG) ")
     parser.add_argument('--camera_height', type=float, default=0.72,
                         help="agent camera height in metres")
-    parser.add_argument('--hfov', type=float, default=80.5,
+    parser.add_argument('--fov', type=float, default=80.5,
                         help="horizontal field of view in degrees")
     parser.add_argument('--turn_angle', type=float, default=15,
                         help="Agent turn angle in degrees")
@@ -171,8 +171,8 @@ def get_args():
 
     # Mapping
     parser.add_argument('--global_downscaling', type=int, default=2)
-    parser.add_argument('--vision_range', type=int, default=100)
-    parser.add_argument('--map_resolution', type=int, default=5)
+    parser.add_argument('--vision_range', type=int, default=600)
+    parser.add_argument('--resolution', type=int, default=5)
     parser.add_argument('--du_scale', type=int, default=1)
     parser.add_argument('--map_size_cm', type=int, default=2400)
     parser.add_argument('--cat_pred_threshold', type=float, default=1.0)
@@ -180,40 +180,21 @@ def get_args():
     parser.add_argument('--exp_pred_threshold', type=float, default=1.0)
     parser.add_argument('--collision_threshold', type=float, default=0.15)
 
+    #相机俯仰角
+    parser.add_argument('--agent_view_angle',type=float, default=0.0)
+
+    parser.add_argument('--obs_threshold',type=float, default=1.0)
+    parser.add_argument('--agent_min_z',type=int, default=-50)
+    parser.add_argument('--agent_max_z',type=int, default=50)
+    parser.add_argument('--agent_height', type=float, default=0.72,
+                        help="agent camera height in metres")
     # parse arguments
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()
 
-    if not args.cuda:
-        args.sem_gpu_id = -2
 
-    if args.num_mini_batch == "auto":
-        args.num_mini_batch = max(args.num_processes // 2, 1)
-    else:
-        args.num_mini_batch = int(args.num_mini_batch)
-
-    if args.map_id == 3:
-        args.split = 'Starbucks'
-        args.num_sem_categories = 1#20
-        if args.task == 'objectnav':
-            args.num_eval_episodes = 19
-        elif args.task == 'reasoning':
-            args.num_eval_episodes = 45
-            args.episodes_dir = 'dataset/reasoning/'
-        elif args.task == 'simple':
-            args.num_eval_episodes = 95
-            args.episodes_dir = 'dataset/simple/'
-        elif args.task == 'vln':
-            args.num_eval_episodes = 56
-            args.episodes_dir = 'dataset/vln/'
-        else:
-            raise ValueError('Unknown task!')
-        args.categories_file = 'dataset/objectnav/Starbucks_categories.json'
-        args.max_episode_length = 500
-
-    args.device = torch.device("cpu" )
-    return args
+    return vars(args)
 
 
 def get_obs(stub):
@@ -225,103 +206,73 @@ def get_obs(stub):
         (images[0].height, images[0].width, images[0].channels))
     rgb = np.frombuffer(images[1].data, dtype=images[1].dtype).reshape(
         (images[1].height, images[1].width, images[1].channels))
-    # convert to BGR format
-    rgb = rgb[:, :, [2, 1, 0]]
+   
     seg = np.frombuffer(images[2].data, dtype=images[2].dtype).reshape(
         (images[2].height, images[2].width, images[2].channels))
-    # self.fx = images[0].parameters.fx
-    # self.fy = images[0].parameters.fy
-    # self.cx = images[0].parameters.cx
-    # self.cy = images[0].parameters.cy
-    # self.matrix = np.array(images[0].parameters.matrix).reshape((4, 4)).transpose()
-    obs = np.concatenate((rgb, depth,seg), axis=2).transpose(2, 0, 1)
-    obs = torch.from_numpy(obs).view(1, 5, 480, 640)
-    print(obs.size())
-    return obs
 
-def navigate(thread_name):
-    print(f"Thread {thread_name} is running")
+    return rgb,depth,seg
+
+def navigate():
     navigator = NavigationController(scene_manager)
-
     target_x = 247  # Target x-coordinate
-    target_y = 0  # Target y-coordinate
-
-    yaw=30
+    target_y = 0  # Target y-coordinate     #cm?
+    yaw = 30
     # Example navigation
     result_scene = navigator.navigate_to_limit(target_x, target_y,yaw,200,100)
     print("Navigation result:", result_scene.info)
+    navigate_end = True
+
+def vis_map(plt,map2d,pose):
+        plt.clf()
+       
+        circle = plt.Circle((pose[1], pose[0]), radius=3.0, fc='y')
+        plt.gca().add_patch(circle)
+        arrow = pose[0:2] + np.array([3.5, 0]).dot(np.array([[np.cos(pose[2]), np.sin(pose[2])], [-np.sin(pose[2]), np.cos(pose[2])]]))
+        plt.plot([pose[1], arrow[1]], [pose[0], arrow[0]])
+        plt.imshow(map2d, cmap='gray', vmin=0, vmax=1)
+        plt.pause(0.005)
+
+navigate_end =True
 
 if __name__ == '__main__':
     scene_manager = SceneManager()
+    camera=CameraController(scene_manager)
     map_id = 3  # Map ID: 3 for the coffee shop
     scene_manager.load_scene(map_id)
     time.sleep(5)
     num_scenes=1
-    # 导航
-    thread1 = threading.Thread(target=navigate, args=("Thread 1:navigation",))
-    thread1.start()
+    # 导航线程
+    thread1 = threading.Thread(target=navigate)
+    # thread1.start()
     # 建图
     args=get_args()
-    
-    device =args.device
-    sem_map_module = Semantic_Mapping(args)
-    sem_map_module.eval()
-    free_sem_map_module = Semantic_Mapping(args, max_height=20, min_height=-150)
-    free_sem_map_module.eval()
-    # Predict semantic map from frame 1
-        # Predict semantic map from frame 1
-    
-    poses = torch.tensor([scene_manager.get_robo_pose()], dtype=torch.float32).to(device)
-    # Initialize map variables:
-    # Full map consists of multiple channels containing the following:
-    # 1. Obstacle Map
-    # 2. Exploread Area
-    # 3. Current Agent Location
-    # 4. Past Agent Locations
-    # 5,6,7,.. : Semantic Categories
-    nc = args.num_sem_categories + 4  # num channels
 
-    # Calculating full and local map sizes
-    map_size = args.map_size_cm // args.map_resolution
-    full_w, full_h = map_size, map_size
-    local_w = int(full_w / args.global_downscaling)
-    local_h = int(full_h / args.global_downscaling)
-
-    # Initializing full and local map
-    full_map = torch.zeros(num_scenes, nc, full_w, full_h).float().to(device)
-    local_map = torch.zeros(num_scenes, nc, local_w,
-                            local_h).float().to(device)
-
-    # Initial full and local pose
-    full_pose = torch.zeros(num_scenes, 3).float().to(device)
-    local_pose = torch.zeros(num_scenes, 3).float().to(device)
-
-    obs=get_obs(scene_manager.sim_client)
-    # obs = torch.from_numpy(obs).unsqueeze(0)
-    
-    
-    local_pose2 = local_pose.clone()
-    free_local_map = local_map.clone()
-
-    _, local_map, _, local_pose = \
-        sem_map_module(obs, poses, local_map, local_pose)
-    _, free_local_map, _, _ = \
-        free_sem_map_module(obs, poses, free_local_map, local_pose2)
-
-
-    
-    camera=CameraController(scene_manager)
-    
-    
-    
-    while(True):
-        obs =  get_obs(scene_manager.sim_client)
-#        obs = torch.from_numpy(obs).cuda(device).unsqueeze(0)
-        #depth=camera.capture_image(GrabSim_pb2.CameraName.Head_Depth)
-        poses=torch.tensor(scene_manager.get_robo_pose())
-  
-
-        _, local_map, _, local_pose = sem_map_module(obs, poses, local_map, local_pose)
-        _, free_local_map, _, _ = free_sem_map_module(obs, poses, free_local_map, local_pose2)
+    plt.ion() # enable real-time plotting
+    plt.figure(1) # create a plot
+    mapbuilder=MapBuilder(args)
+    camera_matrix = du.get_camera_matrix(
+            args['frame_width'],
+            args['frame_height'],
+            args['fov'])
+    rgb,depth,seg =  get_obs(scene_manager.sim_client)
+    camera.save_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Depth))
+    camera.save_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Color))
+    depth = np.where(depth >= 599.0, 0.0, depth)
+    show_pointcloud(rgb,depth,camera_matrix)
+    poses=np.array(scene_manager.get_pose_XYRad())
+    print(poses)
+    while not navigate_end :
+        rgb,depth,seg =  get_obs(scene_manager.sim_client)
+        poses=np.array(scene_manager.get_pose_XYRad())
+        depth = np.where(depth >= 599.0, 0.0, depth)
+        agent_view_cropped, map_gt, agent_view_explored, explored_gt=mapbuilder.update_map(depth,poses)
+        print(agent_view_cropped.shape)
+        print(map_gt.shape)
+        print(agent_view_explored.shape)
+        print(explored_gt.shape)
+        vis_map(plt,map_gt,poses)
         
+
+    
+    # thread1.join()
 

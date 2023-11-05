@@ -29,8 +29,10 @@ def get_camera_matrix(width, height, fov):
     xc = (width - 1.) / 2.
     zc = (height - 1.) / 2.
     f = (width / 2.) / np.tan(np.deg2rad(fov / 2.))
-    camera_matrix = {'xc': xc, 'zc': zc, 'f': f}
+    camera_matrix = {'cx': xc, 'cy': zc, 'fx': f, 'fy': f,
+                     'xc': xc, 'zc': zc, 'f': f,'w':width,'h':height}
     camera_matrix = Namespace(**camera_matrix)
+    
     return camera_matrix
 
 # 计算相机内参
@@ -47,8 +49,7 @@ def get_camera_intrinsic_parameters(width, height, hfov):
     # vfov = 2 * np.arctan(temp / aspect_ratio)
     # fy = (height / 2.) / np.tan(vfov / 2.)
     fy = (height / 2.) / (temp / aspect_ratio)
-    camera_matrix = {'cx': cx, 'cy': cy, 'fx': fx, 'fy': fy,
-                     'xc': (width - 1.) / 2., 'zc': (height - 1.) / 2., 'f': fx}
+    camera_matrix = {'cx': cx, 'cy': cy,  'f': fx}
     camera_matrix = Namespace(**camera_matrix)
     return camera_matrix
 

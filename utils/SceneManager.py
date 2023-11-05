@@ -43,14 +43,19 @@ class SceneManager:
             f"timestamp:{scene.timestamp}, collision:{scene.collision}, info:{scene.info}")
 
     '''
-    return 
+    return robot pose
     (X, Y,Yaw(deg))         
     '''
-    def get_robo_pose(self,scene_id=0):
+    def get_pose_XYDeg(self,scene_id=0):
         scene =  self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
         return scene.location.X,scene.location.Y,(scene.rotation.Yaw)
-
-
+    '''
+    return robot pose 
+    (X, Y,Yaw(deg))         
+    '''
+    def get_pose_XYRad(self,scene_id=0):
+        scene =  self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
+        return scene.location.X,scene.location.Y,(scene.rotation.Yaw)*3.1415926/180.0
 
 
 # if __name__ == '__main__':
