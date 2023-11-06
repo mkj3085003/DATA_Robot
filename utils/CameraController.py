@@ -28,12 +28,15 @@ class CameraController:
     def save_image(self, img_data):
         im = img_data.images[0]
         d = np.frombuffer(im.data, dtype=im.dtype).reshape((im.height, im.width, im.channels))
+        plt.axis('off')   # 去坐标轴
+        plt.xticks([])    # 去 x 轴刻度
+        plt.yticks([])    # 去 y 轴刻度
         if 'depth' in im.name.lower():
             plt.imshow(d, cmap="gray",vmin=0,vmax=600)
-            plt.colorbar()  # 添加颜色条
+            
         else :
             plt.imshow(d)
-        plt.savefig(im.name+".png")
+        plt.savefig(im.name+".png",bbox_inches='tight', pad_inches=0)
 
 if __name__ == '__main__':
     scene_manager = SceneManager()

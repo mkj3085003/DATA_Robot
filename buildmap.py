@@ -11,6 +11,10 @@ import threading
 import argparse
 import torch
 
+navigate_end =False
+
+test_point_cloud=False
+
 def get_args():
     parser = argparse.ArgumentParser(
         description='MO-VLN')
@@ -83,8 +87,8 @@ def get_args():
                         help="path to config yaml containing task information")
     parser.add_argument("--split", type=str, default="TG",
                         help="dataset split (train | val | val_mini | TG) ")
-    parser.add_argument('--camera_height', type=float, default=0.72,
-                        help="agent camera height in metres")
+    parser.add_argument('--camera_height', type=float, default=0,
+                        help="agent camera height in cm")
     parser.add_argument('--fov', type=float, default=80.5,
                         help="horizontal field of view in degrees")
     parser.add_argument('--turn_angle', type=float, default=15,
@@ -174,18 +178,18 @@ def get_args():
     parser.add_argument('--vision_range', type=int, default=600)
     parser.add_argument('--resolution', type=int, default=5)
     parser.add_argument('--du_scale', type=int, default=1)
-    parser.add_argument('--map_size_cm', type=int, default=2400)
+    parser.add_argument('--map_size_cm', type=int, default=6400)
     parser.add_argument('--cat_pred_threshold', type=float, default=1.0)
     parser.add_argument('--map_pred_threshold', type=float, default=1.0)
     parser.add_argument('--exp_pred_threshold', type=float, default=1.0)
     parser.add_argument('--collision_threshold', type=float, default=0.15)
 
     #相机俯仰角
-    parser.add_argument('--agent_view_angle',type=float, default=0.0)
+    parser.add_argument('--agent_view_angle',type=float, default=-12.0)
 
     parser.add_argument('--obs_threshold',type=float, default=1.0)
-    parser.add_argument('--agent_min_z',type=int, default=-50)
-    parser.add_argument('--agent_max_z',type=int, default=50)
+    parser.add_argument('--agent_min_z',type=int, default=-120)
+    parser.add_argument('--agent_max_z',type=int, default=70)
     parser.add_argument('--agent_height', type=float, default=0.72,
                         help="agent camera height in metres")
     # parse arguments
@@ -213,8 +217,9 @@ def get_obs(stub):
     return rgb,depth,seg
 
 def navigate():
+    time.sleep(5)
     navigator = NavigationController(scene_manager)
-    target_x = 247  # Target x-coordinate
+    target_x = 47  # Target x-coordinate
     target_y = 0  # Target y-coordinate     #cm?
     yaw = 30
     # Example navigation
@@ -223,56 +228,75 @@ def navigate():
     navigate_end = True
 
 def vis_map(plt,map2d,pose):
-        plt.clf()
-       
-        circle = plt.Circle((pose[1], pose[0]), radius=3.0, fc='y')
-        plt.gca().add_patch(circle)
-        arrow = pose[0:2] + np.array([3.5, 0]).dot(np.array([[np.cos(pose[2]), np.sin(pose[2])], [-np.sin(pose[2]), np.cos(pose[2])]]))
-        plt.plot([pose[1], arrow[1]], [pose[0], arrow[0]])
-        plt.imshow(map2d, cmap='gray', vmin=0, vmax=1)
-        plt.pause(0.005)
+    plt.clf()
+    
+    plt.imshow(map2d, cmap='viridis',vmin=0,vmax=15)  # viridis是一种颜色映射（colormap）
+    circle = plt.Circle((pose[1], pose[0]), radius=10.0,color="blue", fill=True)
+    plt.gca().add_patch(circle)
 
-navigate_end =True
+    arrow = pose[0:2] + np.array([35, 0]).dot(np.array([[np.cos(pose[2]), np.sin(pose[2])], [-np.sin(pose[2]), np.cos(pose[2])]]))
+    plt.plot([pose[1], arrow[1]], [pose[0], arrow[0]])
+    plt.pause(0.005)
+
+
+
+
+
 
 if __name__ == '__main__':
-    scene_manager = SceneManager()
-    camera=CameraController(scene_manager)
-    map_id = 3  # Map ID: 3 for the coffee shop
-    scene_manager.load_scene(map_id)
-    time.sleep(5)
-    num_scenes=1
-    # 导航线程
-    thread1 = threading.Thread(target=navigate)
-    # thread1.start()
-    # 建图
     args=get_args()
-
-    plt.ion() # enable real-time plotting
-    plt.figure(1) # create a plot
-    mapbuilder=MapBuilder(args)
     camera_matrix = du.get_camera_matrix(
-            args['frame_width'],
-            args['frame_height'],
-            args['fov'])
-    rgb,depth,seg =  get_obs(scene_manager.sim_client)
-    camera.save_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Depth))
-    camera.save_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Color))
-    depth = np.where(depth >= 599.0, 0.0, depth)
-    show_pointcloud(rgb,depth,camera_matrix)
-    poses=np.array(scene_manager.get_pose_XYRad())
-    print(poses)
-    while not navigate_end :
+        args['frame_width'],
+        args['frame_height'],
+        args['fov'])
+    if test_point_cloud:
+        color_image = np.array(plt.imread("Head_Color.png"))
+        depth_image = np.array(plt.imread("Head_Depth.png"))
+        depth_image=(depth_image[:,:,0]).astype(np.float32)*600.0
+
+        depth = np.where(depth_image >= 599.0, 0.0, depth_image)
+        # show_pointcloud(color_image,depth,camera_matrix)
+        map=MapBuilder(args)
+        map.update_map(depth,(247.,        500.,          3.1415926))
+
+
+
+
+
+    else :
+        scene_manager = SceneManager()
+        camera=CameraController(scene_manager)
+        map_id = 3  # Map ID: 3 for the coffee shop
+        scene_manager.load_scene(map_id)
+        time.sleep(5)
+        num_scenes=1
+        # 导航线程
+        thread1 = threading.Thread(target=navigate)
+        thread1.start()
+        # 建图
+        
+
+        plt.ion() # enable real-time plotting
+        plt.figure(1) # create a plot
+        mapbuilder=MapBuilder(args)
+
         rgb,depth,seg =  get_obs(scene_manager.sim_client)
-        poses=np.array(scene_manager.get_pose_XYRad())
+        # camera.save_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Depth))
+        # camera.save_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Color))
+
         depth = np.where(depth >= 599.0, 0.0, depth)
-        agent_view_cropped, map_gt, agent_view_explored, explored_gt=mapbuilder.update_map(depth,poses)
-        print(agent_view_cropped.shape)
-        print(map_gt.shape)
-        print(agent_view_explored.shape)
-        print(explored_gt.shape)
-        vis_map(plt,map_gt,poses)
+        #show_pointcloud(rgb,depth,camera_matrix)
+        poses=np.array(scene_manager.get_pose_XYRad())
+        print(poses)
+        while not navigate_end :
+            rgb,depth,seg =  get_obs(scene_manager.sim_client)
+            poses=np.array(scene_manager.get_pose_XYRad())
+            depth = np.where(depth >= 599.0, 0.0, depth)
+            mp=mapbuilder.update_map(depth,poses)
+            x,y=mapbuilder.pos_to_index(poses[0],poses[1])
+            vis_map(plt,mp,(x,y,poses[2]))
         
 
     
-    # thread1.join()
+    thread1.join()
 

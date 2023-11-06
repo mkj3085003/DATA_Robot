@@ -97,8 +97,8 @@ def transform_camera_view(XYZ, sensor_height, camera_elevation_degree):
     # Apply the rotation matrix to the point cloud
     XYZ = np.matmul(XYZ.reshape(-1, 3), R.T).reshape(XYZ.shape)
 
-    # Adjust the Z coordinate to account for the sensor height
-    XYZ[..., 2] = XYZ[..., 2] + sensor_height
+    # Adjust the Y coordinate to account for the sensor height
+    XYZ[..., 1] = XYZ[..., 1] + sensor_height
     return XYZ
 
 # 局部坐标->世界坐标
@@ -112,11 +112,21 @@ def transform_pose(XYZ, current_pose):
     Output:
         XYZ : ...x3
     """
-    R = ru.get_r_matrix([0., 0., 1.], angle=current_pose[2] - np.pi / 2.)
-    XYZ = np.matmul(XYZ.reshape(-1, 3), R.T).reshape(XYZ.shape)
-    XYZ[:, :, 0] = XYZ[:, :, 0] + current_pose[0]
-    XYZ[:, :, 1] = XYZ[:, :, 1] + current_pose[1]
+    t = current_pose[2] -np.pi / 2.
+    rotation_matrix = np.array([[np.cos(t) ,0, np.sin(t)],
+                                [0         ,1, 0    ],
+                                [-np.sin(t),0, np.cos(t)]
+                            ])
+
+    # 将点云中的每个点应用旋转矩阵
+    XYZ = np.dot(XYZ, rotation_matrix)
+    XYZ[ :, 0] = XYZ[ :, 0] + current_pose[0]
+    XYZ[ :, 2] = XYZ[ :, 2] + current_pose[1]
     return XYZ
+
+
+
+
 
 
 def bin_points(XYZ_cms, map_size, z_bins, xy_resolution):
