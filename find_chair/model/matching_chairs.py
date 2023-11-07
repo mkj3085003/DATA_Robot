@@ -3,7 +3,9 @@ import openai
 # 设置你的 OpenAI API 密钥,1$
 api_key = "sk-0DTIEOCIY1D6XoafRo8wqBWcqZMf4rmCIxMRKtij8LcQJ3h1"
 openai.api_base = "https://openkey.cloud/v1" 
+#记录一些可用的1$的apikey
 #sk-buhXFrwePhTBLpJNdgDz1EavrFpqmViAgZ9cYhDI4TsWK7o5
+#sk-z2ztez3nzdjRerVojn5LcTSsE5JzXxuDWk3oRHvigO0RzPHV
 #https://openkey.cloud
 # 初始化 OpenAI 客户端
 openai.api_key = api_key
@@ -42,25 +44,81 @@ def get_completion_from_messages(messages, model="gpt-3.5-turbo", temperature=0)
     return response.choices[0].message["content"]
 
 if __name__ == '__main__':
+    num1="one"
+    num2="3"
+    num3="1"
+    feature1="I came alone, but I was a little sad and don't want others to disturb me. The best seats have a better view."
+    feature2="We have a child who may be noisy and would like to sit further away from the crowd, and it would be better if the seat is softer and lower."
+    feature3="I'm looking for a girl named Lily"
     messages =[  
     context,#system
     {'role':'assistant', 'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "},
-    {'role':'user', 'content':'There are 3 of us'},
-    {'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material, etc.?'},
-    {'role':'user', 'content': "We have a child who may be noisy and would like to sit further away from the crowd, and it would be better if the seat is softer and lower."},
-    {'role':'user', 'content':"Create a json summary of the previous talks. \
-    To itemize chair requirements, the fields should be 1) Capacity, 2) location ,3) material, 4) height.\
+    {'role':'user', 'content':num1},
+    {'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material,or avoid the crowd etc.?'},
+    {'role':'user', 'content': feature1},
+    {'role':'system', 'content':"Create a json summary of the previous talks. \
+    To itemize chair requirements, the fields should be 1)Capacity, 2)Location,3)Share,4)Material,5)Height.\
      it is important that each value in json selects the most similar content from the given Chair's features.\
      Chair's features include:\
-        Location: Near the window, near the bar\
-        Material: wood, metal, sofa\
-        Capacity: num of people\
-        Height: high, low\
-        Capacity is of type int which the value is found from the first user's answer of the number of people, and the others are of type str you can faind from  the second user's answer .\
-        for example\
-        "}#system
+        Location: 'dont mind';'Near the window';'near the bar'(which means close to the crowd and easy to take an order);'center of the caffe'\
+        Share:'dont mind sharing a table';'alone'(which means need a quite enviroment or dont want too be bothered oor bother others)\
+        Height: 'high';'low';'dont mind'\
+        Material: 'wood';'metal';'sofa';'dont mind'\
+        Capacity is of type int which the value is found from the first user's answer of the number of people, and the others are of type str you can find from  the second user's answer .if not mentioned in the talk ,filled the value 'dont mind'"}#system
     ]
+    
     response = get_completion_from_messages(messages, temperature=1)
     print('temperature=1:\n',response)
+    response = get_completion_from_messages(messages, temperature=0.5)
+    print('temperature=0.5:\n',response)
     response = get_completion_from_messages(messages, temperature=0)
+    print('temperature=0:\n',response)
+
+    messages1 =[  
+    context,#system
+    {'role':'assistant', 'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "},
+    {'role':'user', 'content':num2},
+    {'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material,or avoid the crowd etc.?'},
+    {'role':'user', 'content': feature2},
+    {'role':'system', 'content':"Create a json summary of the previous talks. \
+    To itemize chair requirements, the fields should be 1)Capacity, 2)Location,3)Share,4)Material,5)Height.\
+     it is important that each value in json selects the most similar content from the given Chair's features.\
+     Chair's features include:\
+        Location: 'dont mind';'Near the window';'near the bar';'center of the caffe'\
+        Share:'dont mind sharing a table';'alone'\
+        Height: 'high';'low';'dont mind'\
+        Material: 'wood';'metal';'sofa';'dont mind'\
+        Capacity is of type int which the value is found from the first user's answer of the number of people, and the others are of type str you can find from  the second user's answer .if not mentioned in the talk ,filled the value 'dont mind'"}#system
+    ]
+    response = get_completion_from_messages(messages1, temperature=1)
+    print('temperature=1:\n',response)
+    response = get_completion_from_messages(messages1, temperature=0.5)
+    print('temperature=0.5:\n',response)
+    response = get_completion_from_messages(messages1, temperature=0)
+    print('temperature=0:\n',response)
+    messages2 =[  
+    context,#system
+    {'role':'assistant', 'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "},
+    {'role':'user', 'content':num3},
+    {'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material,or avoid the crowd etc.?'},
+    {'role':'user', 'content': feature3},
+    {'role':'system', 'content':"\
+     At the very beginning, you have to determine his intention during the conversation. \
+     If he is not here for dinner, please return an ERROR and politely reject his request.\
+    else,\
+     Create a json summary of the previous talks. \
+    To itemize chair requirements, the fields should be 1)Capacity, 2)Location,3)Share,4)Material,5)Height.\
+     it is important that each value in json selects the most similar content from the given Chair's features.\
+     Chair's features include:\
+        Location: 'dont mind';'Near the window';'near the bar';'center of the caffe'\
+        Share:'dont mind sharing a table';'alone'\
+        Height: 'high';'low';'dont mind'\
+        Material: 'wood';'metal';'sofa';'dont mind'\
+        Capacity is of type int which the value is found from the first user's answer of the number of people, and the others are of type str you can find from  the second user's answer .if not mentioned in the talk ,filled the value 'dont mind'.and you should judge the intention "}#system
+    ]
+    response = get_completion_from_messages(messages2, temperature=1)
+    print('temperature=1:\n',response)
+    response = get_completion_from_messages(messages2, temperature=0.5)
+    print('temperature=0.5:\n',response)
+    response = get_completion_from_messages(messages2, temperature=0)
     print('temperature=0:\n',response)
