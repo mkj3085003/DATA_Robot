@@ -1,99 +1,118 @@
-[{   "id":0,
-"position point": [12.1,225.6],
-"feature":"0110111",
-"sitted":false
+[{   
+    "id":0,
+    "Capacity":4,
+    "position point": [12.1,225.6],
+    "feature":"0110111",
+    "sitted":false
 },
-{   "id":1,
-"position":[11.5,12.7],
-"feature":"0110100", 
-"sitted":false
+{   
+    "id":1,
+    "Capacity":4,
+    "position":[11.5,12.7],
+    "feature":"0110100", 
+    "sitted":false
 },
 {
-"id":2,
-"position":[22.5,12.7],
-"feature":"0101100", 
-"sitted":false
+    "id":2,
+    "Capacity":4,
+    "position":[22.5,12.7],
+    "feature":"0101100", 
+    "sitted":false
 },
 {
     "id": 3,
+    "Capacity":4,
     "position": [15.2, 17.9],
     "feature": "0101110",
     "sitted": false
 },
 {
     "id": 4,
+    "Capacity":4,
     "position": [9.8, 19.3],
     "feature": "0010011",
     "sitted": false
 },
 {
     "id": 5,
+    "Capacity":4,
     "position": [18.7, 20.6],
     "feature": "0011100",
     "sitted": false
 },
 {
     "id": 6,
+    "Capacity":4,
     "position": [21.4, 10.5],
     "feature": "0101011",
     "sitted": true
 },
 {
     "id": 7,
+    "Capacity":4,
     "position": [12.6, 15.2],
     "feature": "0111110",
     "sitted": true
 },
 {
     "id": 8,
+    "Capacity":4,
     "position": [14.2, 16.5],
     "feature": "1001110",
     "sitted": false
 },
 {
     "id": 9,
+    "Capacity":4,
     "position": [11.7, 18.3],
     "feature": "0101010",
     "sitted": true
 },
 {
     "id": 10,
+    "Capacity":4,
     "position": [19.8, 12.1],
     "feature": "1110101",
     "sitted": true
 },
 {
     "id": 11,
+    "Capacity":6,
     "position": [16.5, 14.7],
     "feature": "0011101",
     "sitted": false
 },
 {
     "id": 12,
+    "Capacity":4,
     "position": [13.8, 13.2],
     "feature": "0111000",
     "sitted": false
 },
 {
     "id": 13,
+    "Capacity":4,
     "position": [17.4, 16.9],
     "feature": "1010100",
     "sitted": true
 },
 {
     "id": 14,
+    "Capacity":8,
     "position": [15.9, 11.5],
     "feature": "1000011",
     "sitted": true
 },
 {
     "id": 15,
+    "Capacity":5,
     "position": [12.3, 19.2],
     "feature": "0101111",
     "sitted": false
 },
 {
     "id": 16,
+    "Capacity":4,
     "position": [20.1, 15.7],
     "feature": "1111110",
     "sitted": false
