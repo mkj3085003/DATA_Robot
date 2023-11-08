@@ -1,31 +1,46 @@
 import openai
-
+import json
 # 设置你的 OpenAI API 密钥,1$
-api_key = "sk-0DTIEOCIY1D6XoafRo8wqBWcqZMf4rmCIxMRKtij8LcQJ3h1"
-openai.api_base = "https://openkey.cloud/v1" 
+api_key = "sk-z2ztez3nzdjRerVojn5LcTSsE5JzXxuDWk3oRHvigO0RzPHV"
+openai.api_base = "https://openkey.cloud/v1"
+openai.api_key = api_key 
 #记录一些可用的1$的apikey
-#sk-buhXFrwePhTBLpJNdgDz1EavrFpqmViAgZ9cYhDI4TsWK7o5
-#sk-z2ztez3nzdjRerVojn5LcTSsE5JzXxuDWk3oRHvigO0RzPHV
-#https://openkey.cloud
-# 初始化 OpenAI 客户端
-openai.api_key = api_key
 
-context = {'role':'system', 'content':"""
-You are a cafe waiter robot that automatically collects order information for a pizza restaurant.
-you want:
-     1. First, greet the customers and how many people are dining there.
-     2. Then, wait for the user to reply to collect the number of diners and the customer's seating tendency and preferences.
-     3. After collecting the information, you need to streamline and process the information, and output the num+feature-description of the chair in json format.
-     4. Finally reply to the location of the best matching chair retrieved by the customer, ask the customer if they are satisfied, and indicate that you will lead them to the chair and ask them to follow you.
+#4. Finally reply to the location of the best matching chair retrieved by the customer, ask the customer if they are satisfied, and indicate that you will lead them to the chair and ask them to follow you.
+prompt_front = {'role':'system', 'content':"""
+You are a cafe waiter robot that automatically collects seat order information for a Starbucks. Follow these steps to collect and format the seat order:
 
-Please make sure to identify all chair characteristics and location information so that the match can be identified from existing chairs in the cafe.
-Your response should be presented in a brief, very casual and friendly style.
+1. Start by greeting the customers and asking how many people are dining together.
+2. Wait for the user to reply with the number of diners and their seating preferences, including details such as location, sharing, height, material, and any special requests.
+3. After collecting the information, you need to process it and output the seat order in JSON format. The JSON format should include the following fields:
+   - Capacity (An integer value, conclude from the first user's reply)
+   - Location (options: 'dont mind', 'Near the window', 'near the bar', 'center of the cafe')
+   - Share (options: 'dont mind sharing a table', 'alone')
+   - Height (options: 'high', 'low', 'dont mind')
+   - Material (options: 'wood', 'metal', 'sofa', 'dont mind')
 
-When the customer's answer fails to match the content, please return an error and politely reject the customer's request.
-"""}  # accumulate messages
+4. If any of the information is missing in the user's response, fill it with 'dont mind'.
 
-promt=""
-# 用户输入的问题
+Please ensure that each value in the JSON is selected from the most similar content given in the customer's response. You can find these values in the customer's reply.
+
+When the customer's answer does not match the available options or is unclear, respond with a statement starting with "ERROR:" and politely request clarifications.
+
+Your response should be in one of two formats:
+1. A JSON file containing the seat order.without other words.
+    for example:
+        {'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+2. An error message when the customer's response cannot be understood.
+    for example:
+        "ERROR: we don't have hotpot"
+
+"""}  # accumulate messages 
+#Capacity (An integer value, inferred from the first user's reply)，inferred 会增加回复的时间
+
+first_ask={'role':'assistant', 'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "}
+second_ask={'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material,or avoid the crowd etc.?'}
+prompt_end={'role':'system', 'content':"conversation is end.please return the json"}
+
+
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
     response = openai.ChatCompletion.create(
@@ -39,86 +54,49 @@ def get_completion_from_messages(messages, model="gpt-3.5-turbo", temperature=0)
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
-        temperature=temperature, # 控制模型输出的随机程度
+        temperature=temperature  # Control the randomness of model output
     )
-    return response.choices[0].message["content"]
+    content = response.choices[0].message['content']
+    print("first response:\n",content)
+    # Check if the content starts with '{' to identify JSON output
+    if content.strip().startswith('{'):
+        try:
+            # Attempt to parse the content as JSON
+            seat_order = json.loads(content)
+            # If successful, return the JSON content
+            return seat_order
+        except json.JSONDecodeError:
+            # If parsing as JSON fails,let the model's response escond time
+            error_message = f" Please provide valid JSON format.\n Response from the model: {content}"
+            second_reply=json.loads(get_completion(error_message))
+            return second_reply
+    
+    # Check if the content is an error message
+    else:   return content
+
+    # If the content doesn't match either format, return an error message
+    # return "Error: Unable to process the request. Please provide valid information."
+    # return content
+    
 
 if __name__ == '__main__':
-    num1="one"
-    num2="3"
-    num3="1"
-    feature1="I came alone, but I was a little sad and don't want others to disturb me. The best seats have a better view."
-    feature2="We have a child who may be noisy and would like to sit further away from the crowd, and it would be better if the seat is softer and lower."
-    feature3="I'm looking for a girl named Lily"
-    messages =[  
-    context,#system
-    {'role':'assistant', 'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "},
-    {'role':'user', 'content':num1},
-    {'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material,or avoid the crowd etc.?'},
-    {'role':'user', 'content': feature1},
-    {'role':'system', 'content':"Create a json summary of the previous talks. \
-    To itemize chair requirements, the fields should be 1)Capacity, 2)Location,3)Share,4)Material,5)Height.\
-     it is important that each value in json selects the most similar content from the given Chair's features.\
-     Chair's features include:\
-        Location: 'dont mind';'Near the window';'near the bar'(which means close to the crowd and easy to take an order);'center of the caffe'\
-        Share:'dont mind sharing a table';'alone'(which means need a quite enviroment or dont want too be bothered oor bother others)\
-        Height: 'high';'low';'dont mind'\
-        Material: 'wood';'metal';'sofa';'dont mind'\
-        Capacity is of type int which the value is found from the first user's answer of the number of people, and the others are of type str you can find from  the second user's answer .if not mentioned in the talk ,filled the value 'dont mind'"}#system
-    ]
     
-    response = get_completion_from_messages(messages, temperature=1)
-    print('temperature=1:\n',response)
-    response = get_completion_from_messages(messages, temperature=0.5)
-    print('temperature=0.5:\n',response)
-    response = get_completion_from_messages(messages, temperature=0)
-    print('temperature=0:\n',response)
-
-    messages1 =[  
-    context,#system
-    {'role':'assistant', 'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "},
-    {'role':'user', 'content':num2},
-    {'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material,or avoid the crowd etc.?'},
-    {'role':'user', 'content': feature2},
-    {'role':'system', 'content':"Create a json summary of the previous talks. \
-    To itemize chair requirements, the fields should be 1)Capacity, 2)Location,3)Share,4)Material,5)Height.\
-     it is important that each value in json selects the most similar content from the given Chair's features.\
-     Chair's features include:\
-        Location: 'dont mind';'Near the window';'near the bar';'center of the caffe'\
-        Share:'dont mind sharing a table';'alone'\
-        Height: 'high';'low';'dont mind'\
-        Material: 'wood';'metal';'sofa';'dont mind'\
-        Capacity is of type int which the value is found from the first user's answer of the number of people, and the others are of type str you can find from  the second user's answer .if not mentioned in the talk ,filled the value 'dont mind'"}#system
-    ]
-    response = get_completion_from_messages(messages1, temperature=1)
-    print('temperature=1:\n',response)
-    response = get_completion_from_messages(messages1, temperature=0.5)
-    print('temperature=0.5:\n',response)
-    response = get_completion_from_messages(messages1, temperature=0)
-    print('temperature=0:\n',response)
-    messages2 =[  
-    context,#system
-    {'role':'assistant', 'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "},
-    {'role':'user', 'content':num3},
-    {'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material,or avoid the crowd etc.?'},
-    {'role':'user', 'content': feature3},
-    {'role':'system', 'content':"\
-     At the very beginning, you have to determine his intention during the conversation. \
-     If he is not here for dinner, please return an ERROR and politely reject his request.\
-    else,\
-     Create a json summary of the previous talks. \
-    To itemize chair requirements, the fields should be 1)Capacity, 2)Location,3)Share,4)Material,5)Height.\
-     it is important that each value in json selects the most similar content from the given Chair's features.\
-     Chair's features include:\
-        Location: 'dont mind';'Near the window';'near the bar';'center of the caffe'\
-        Share:'dont mind sharing a table';'alone'\
-        Height: 'high';'low';'dont mind'\
-        Material: 'wood';'metal';'sofa';'dont mind'\
-        Capacity is of type int which the value is found from the first user's answer of the number of people, and the others are of type str you can find from  the second user's answer .if not mentioned in the talk ,filled the value 'dont mind'.and you should judge the intention "}#system
-    ]
-    response = get_completion_from_messages(messages2, temperature=1)
-    print('temperature=1:\n',response)
-    response = get_completion_from_messages(messages2, temperature=0.5)
-    print('temperature=0.5:\n',response)
-    response = get_completion_from_messages(messages2, temperature=0)
-    print('temperature=0:\n',response)
+    ORDER_LIST=[]
+    with open("data_order.json", 'r') as json_file:
+        ORDER_DATA_FILE = json_file.read()
+        ORDER_LIST = json.loads(ORDER_DATA_FILE)
+    # 打开JSON文件并加载数据
+    
+    for i in range(len(ORDER_LIST)): #慎用GPTkey余额有限
+    # for i in range(5):
+        message =[  
+        prompt_front,first_ask,
+        {'role':'user', 'content':ORDER_LIST[i]["num"]},
+        second_ask,
+        {'role':'user', 'content': ORDER_LIST[i]["need"]},
+        prompt_front #system
+        ]
+        # print(ORDER_LIST[i])
+        print('Iterate',i )
+        response = get_completion_from_messages(message, temperature=0.3)
+        print('proceed resopnse:\n',response)
