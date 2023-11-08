@@ -1,0 +1,167 @@
+[
+    {
+    "num"  :"I come alone",
+    "need" :"I am a little sad and don't want others to disturb me. it is better that my seat have a good view."
+    },
+    {
+    "num"  :"3",
+    "need" :"We have a child who may be noisy and would like to sit further away from the crowd, and it would be better if the seat is softer and lower."
+    },
+    {
+    "num"  :"I'm looking for a girl named Lily",
+    "need" :" You are so boring"
+    },
+    {
+        "num": "I'm dining alone.",
+        "need": "I'd like a quiet corner seat with a view of the street to enjoy some solitude."
+    },
+    {
+        "num": "We're a group of five friends.",
+        "need": "We'd like a large round table near the window with comfortable chairs for a fun get-together."
+    },
+    {
+        "num": "There are two of us.",
+        "need": "We prefer a cozy booth with dim lighting for a romantic date night."
+    },
+    {
+        "num": "I'm alone.",
+        "need": "I want to sit at the bar, close to the bartender, and watch the drinks being made."
+    },
+    {
+        "num": "We're a family of four.",
+        "need": "We need a spacious table with child-friendly seating and a view of the garden for the kids."
+    },
+    {
+        "num": "I'm by myself.",
+        "need": "I'd like a window seat to read a book while sipping my coffee."
+    },
+    {
+        "num": "There are six of us.",
+        "need": "We're a large family, so we need a long table with high chairs for the little ones and a view of the playground."
+    },
+    {
+        "num": "I'm dining solo.",
+        "need": "I'd prefer a seat in a quiet corner away from the crowd to work on my laptop."
+    },
+    {
+        "num": "We're a group of three colleagues.",
+        "need": "We need a table near an electrical outlet and comfortable chairs for our meeting."
+    },
+    {
+        "num": "I'm here alone.",
+        "need": "I'd like a seat by the fireplace for a warm and cozy ambiance."
+    },
+    {
+        "num": "There are four of us.",
+        "need": "We prefer a circular table where we can all converse easily."
+    },
+    {
+        "num": "I'm with a friend.",
+        "need": "High stools by the counter would be convenient for us."
+    },
+    {
+        "num": "We're a family of five.",
+        "need": "Child-friendly seating and a view of the outdoor playground are a must for us."
+    },
+    {
+        "num": "I'm dining alone.",
+        "need": "I'd like a seat with a view of the stage for the live performance tonight."
+    },
+    {
+        "num": "There are seven of us.",
+        "need": "We're a big group celebrating a special occasion. We need a long table in a lively part of the cafe."
+    },
+    {
+        "num": "I'm alone.",
+        "need": "I'd prefer a seat by the bookshelves as I'd like to read during my meal."
+    },
+    {
+        "num": "I'm here with a colleague.",
+        "need": "We're here for a quick coffee and need high stools by the coffee counter."
+    },
+    {
+        "num": "We're a family of six.",
+        "need": "We need a spacious booth with a view of the cafe's activities to keep the kids entertained."
+    },
+    {
+        "num": "I'm alone.",
+        "need": "I'd like a seat near the open kitchen to watch the chefs at work."
+    },
+    {
+        "num": "We're a group of four friends.",
+        "need": "A large round table in a vibrant part of the cafe would be ideal for our catch-up."
+    },
+    {
+        "num": "I'm here by myself.",
+        "need": "I prefer a quiet corner with soft, cushioned chairs for relaxation."
+    },
+    {
+        "num": "We're a family of three.",
+        "need": "A booth with child-friendly seating and a view of the garden is what we need."
+    },
+    {
+        "num": "I'm dining alone.",
+        "need": "I'd like a cozy seat near the window with lots of natural light."
+    },
+    {
+        "num": "There are five of us.",
+        "need": "We want a large table near the bar for our group gathering. Comfortable barstools would be great."
+    },
+    {
+        "num": "I'm here alone.",
+        "need": "I'd like a quiet corner seat away from the crowd with a high-backed chair for some privacy."
+    },
+    {
+        "num": "We're a group of six friends.",
+        "need": "We need a spacious table in a lively part of the cafe for our celebration."
+    },
+    {
+        "num": "I'm dining solo.",
+        "need": "I'd like a window seat to enjoy a beautiful view of the street."
+    },
+    {
+        "num": "We're a family of four with a pet dog.",
+        "need": "We need an outdoor table with a view and a water bowl for our furry friend."
+    },
+    {
+        "num": "I'm alone.",
+        "need": "I'd like a seat near the cozy fireplace to stay warm on a chilly evening."
+    },
+    {
+        "num": "There are three of us.",
+        "need": "We're a small group and would like a round table with comfortable chairs."
+    },
+    {
+        "num": "I'm here by myself.",
+        "need": "I'd prefer a seat near the artwork, as I appreciate the aesthetics."
+    },
+    {
+        "num": "We're a family of five with dietary restrictions.",
+        "need": "We need a table with gluten-free menu options and comfortable seating."
+    },
+    {
+        "num": "I'm alone.",
+        "need": "I'd like a high stool by the bar, where I can watch the bartenders at work."
+    },
+    {
+        "num": "We're a group of four coworkers.",
+        "need": "We need a large table with good Wi-Fi for our working lunch."
+    },
+    {
+        "num": "I'm dining solo.",
+        "need": "I'd like a seat with a view of the garden to enjoy nature while I eat."
+    },
+    {
+        "num": "There are five of us.",
+        "need": "We're a group of friends and prefer a table in a separate area with a view of the garden."
+    },
+    {
+        "num": "I'm dining alone.",
+        "need": "I'd like a table near the live music stage to enjoy the performance."
+    },
+    {
+        "num": "We're a group of seven colleagues.",
+        "need": "We need a long table for our casual meeting in a quieter part of the cafe."
+    }
+      
+]
