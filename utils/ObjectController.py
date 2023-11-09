@@ -3,7 +3,7 @@ import grpc
 import GrabSim_pb2_grpc
 import GrabSim_pb2
 
-from SceneManager import SceneManager
+from .SceneManager import SceneManager
 class ObjectController:
     def __init__(self, scene_manager):
         self.scene_manager = scene_manager

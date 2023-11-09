@@ -3,13 +3,16 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import GrabSim_pb2
-from SceneManager import SceneManager
+from .SceneManager import SceneManager
 
 class CameraController:
     def __init__(self, scene_manager):
         self.scene_manager = scene_manager
 
     def capture_image(self, camera_name, scene_id=0):
+        # GrabSim_pb2.CameraName.Head_Color
+        # GrabSim_pb2.CameraName.Head_Depth
+        # GrabSim_pb2.CameraName.Head_Segment
         action = GrabSim_pb2.CameraList(cameras=[camera_name], scene=scene_id)
         img_data = self.scene_manager.sim_client.Capture(action)
         return img_data
