@@ -82,7 +82,7 @@ def get_completion_from_messages(messages, model="gpt-3.5-turbo", temperature=0)
 if __name__ == '__main__':
     
     ORDER_LIST=[]
-    with open("data_order.json", 'r') as json_file:
+    with open("..\data\data_order.json", 'r') as json_file:
         ORDER_DATA_FILE = json_file.read()
         ORDER_LIST = json.loads(ORDER_DATA_FILE)
     # 打开JSON文件并加载数据

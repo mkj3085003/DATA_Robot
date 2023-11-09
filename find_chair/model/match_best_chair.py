@@ -4,7 +4,7 @@ import json
 CHAIR_LIST=[]
 # TO DO:获取Starbucks里所有座椅的类型坐标以及对应的位置及特征存储在find_chair\model\data_chair.json，
 # 补充完CHAIR_LIST的值
-with open("find_chair\model\data_chair.json", 'r') as json_file:
+with open("..\data\data_chair.json", 'r') as json_file:
     json_str = json_file.read()
     CHAIR_LIST = json.loads(json_str)
 # 打开JSON文件并加载数据
