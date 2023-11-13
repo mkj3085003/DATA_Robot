@@ -31,12 +31,8 @@ class OrderAgent(ChatBot):
                             Follow these steps to collect and format the order:
                             1. greet and offer him the menu.
                             2. ask him for the item and number he want to order.options of item must from menu.
-                            3. return a json file of the order.
                             Please make sure to specify all options, quantities, so that the item is uniquely identifiable from the menu.
-                            there are three things you need pay attentions to:
-                            1. Your response should be presented in a brief, very casual and friendly style.
-                            2. Check whether the user's anwser in the conversation contains food options in the menu and the corresponding quantity.if so,reply:'Ordering is over, I will repeat your order.' 
-                            3. if the food option not find in menu.ask user to order from the menu again.
+                            Your response should be presented in a brief, very casual and friendly style. 
                             """,
                             'role': 'assistant', 'content': """It's my pleasure to serve you. What would you like to order? here is the menu"""
                             }

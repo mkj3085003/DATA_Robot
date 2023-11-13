@@ -163,7 +163,7 @@ response from gpt:
 
 order bot: It's my pleasure to serve you. What would you like to order? Here is our menu 
 ['Cake', 'Walnut', 'Mangosteen', 'SourMilkDrink', 'Banana', 'Bernachon', 'Date', 'HamSausage', 'SesameSeedCake', 'Watermelon', 'NFCJuice', 'Dunian', 'StickyNotes', 'Garlic', 'TeaTray', 'Bread', 'SpringWater', 'Softdrink', 'Gum', 'Apple', 'CoconutMilk', 'YogurtDrink', 'Yogurt', 'MilkDrink', 'OrangeJuice', 'Coffee', 'ADMilk', 'CoconutWater', 'Orange', 'CandyCase', 'Chips', 'TennisBall', 'Milk']
-user:I want a glass of milk and a juice for my daughter.
+user:I want a glass of milk and a OrangeJuice for my daughter.
 chat bot: Certainly! I can help you with that. What type of juice would you like for your daughter? We have options such as orange, apple, grape, and pineapple.
 user:OrangeJuice.
 chat bot: Certainly! I will bring you a glass of milk and a glass of orange juice for your daughter. Is there anything else you would like to order?
@@ -185,3 +185,129 @@ response from gpt:
 {'object': 'milk', 'num': 1}
 
 #### 不具有记忆性，且无法辨别菜单。
+### try:
+order bot: It's my pleasure to serve you. What would you like to order? Here is our menu 
+['Cake', 'Walnut', 'Mangosteen', 'SourMilkDrink', 'Banana', 'Bernachon', 'Date', 'HamSausage', 'SesameSeedCake', 'Watermelon', 'NFCJuice', 'Dunian', 'StickyNotes', 'Garlic', 'TeaTray', 'Bread', 'SpringWater', 'Softdrink', 'Gum', 'Apple', 'CoconutMilk', 'YogurtDrink', 'Yogurt', 'MilkDrink', 'OrangeJuice', 'Coffee', 'ADMilk', 'CoconutWater', 'Orange', 'CandyCase', 'Chips', 'TennisBall', 'Milk']
+user:I want a glass of milk and a OrangeJuice for my daughter.
+chat bot: Certainly! I will bring you a glass of milk and a glass of orange juice for your daughter. Is there anything else you would like to order?
+if end: False
+user:No,thanks.
+chat bot: Alright, let me know if you change your mind.
+if end: False
+user:No,thanks.
+chat bot: Alright, let me know if you change your mind.
+if end: False
+user:I wont change my mind.
+chat bot: Alright, no problem. If you change your mind, feel free to let me know.
+if end: False
+user:ok.
+chat bot: Alright, no problem. Let me know if you change your mind or if there's anything else I can assist you with.
+if end: False
+user:ok
+chat bot: Alright, no problem. Let me know if you change your mind.
+if end: False
+===============coversation is over===============
+response from gpt:
+ {
+  "object": "milk",
+  "num": 1
+}
+{'object': 'milk', 'num': 1}
+
+
+####修改if_end只对user的输入进行判断
+
+order bot: It's my pleasure to serve you. What would you like to order? Here is our menu 
+['Cake', 'Walnut', 'Mangosteen', 'SourMilkDrink', 'Banana', 'Bernachon', 'Date', 'HamSausage', 'SesameSeedCake', 'Watermelon', 'NFCJuice', 'Dunian', 'StickyNotes', 'Garlic', 'TeaTray', 'Bread', 'SpringWater', 'Softdrink', 'Gum', 'Apple', 'CoconutMilk', 'YogurtDrink', 'Yogurt', 'MilkDrink', 'OrangeJuice', 'Coffee', 'ADMilk', 'CoconutWater', 'Orange', 'CandyCase', 'Chips', 'TennisBall', 'Milk']
+if end: False
+user:I want a SpringWate and 3 Oranges.
+order bot: Sure! I can help you with that. Here's your order:
+
+- 1 SpringWater
+- 3 Oranges
+
+Is there anything else you would like to add to your order?
+if end: True
+if menu: True
+===============Order corversation is over===============
+response from gpt:
+ {
+  "object": "SpringWater",
+  "num": 1
+}
+{'object': 'SpringWater', 'num': 1}
+
+
+### 在prompt中给了一个for example解决只有一个输出的问题
+
+ng.py
+order bot: It's my pleasure to serve you. What would you like to order? Here is our menu 
+['Cake', 'Walnut', 'Mangosteen', 'SourMilkDrink', 'Banana', 'Bernachon', 'Date', 'HamSausage', 'SesameSeedCake', 'Watermelon', 'NFCJuice', 'Dunian', 'StickyNotes', 'Garlic', 'TeaTray', 'Bread', 'SpringWater', 'Softdrink', 'Gum', 'Apple', 'CoconutMilk', 'YogurtDrink', 'Yogurt', 'MilkDrink', 'OrangeJuice', 'Coffee', 'ADMilk', 'CoconutWater', 'Orange', 'CandyCase', 'Chips', 'TennisBall', 'Milk']
+if end: False
+user:I want a latte and a cup of AD calcium milk for my daughter.
+order bot: Certainly! I will get you a latte and a cup of AD calcium milk for your daughter. Anything else you would like to order?
+if end: True
+if menu: False
+order bot: Apologies for the confusion. Here is the menu again:
+
+1. Cake
+2. Walnut
+3. Mangosteen
+4. Sour Milk Drink
+5. Banana
+6. Bernachon
+7. Date
+8. Ham Sausage
+9. Sesame Seed Cake
+10. Watermelon
+11. NFC Juice
+12. Dunian
+13. Sticky Notes
+14. Garlic
+15. Tea Tray
+16. Bread
+17. Spring Water
+18. Soft drink
+19. Gum
+20. Apple
+21. Coconut Milk
+22. Yogurt Drink
+23. Yogurt
+24. Milk Drink
+25. Orange Juice
+26. Coffee
+27. AD Milk
+28. Coconut Water
+29. Orange
+30. Candy Case
+31. Chips
+32. Tennis Ball
+33. Milk
+
+Please let me know the items you would like to order and the quantities.
+user:I want a TeaTray and a AD Milk.
+order bot: Certainly! I will get you a TeaTray and a cup of AD Milk. Anything else you would like to order?
+if end: True
+if menu: True
+user:No,thanks.
+order bot: You're welcome! If you need anything else, feel free to ask. Enjoy your TeaTray and AD Milk!
+if end: True
+if menu: True
+===============Order corversation is over===============
+response from gpt:
+ [{
+  "object": "TeaTray",
+  "num": 1
+},
+{
+  "object": "ADMilk",
+  "num": 1
+}]
+[{
+  "object": "TeaTray",
+  "num": 1
+},
+{
+  "object": "ADMilk",
+  "num": 1
+}]
