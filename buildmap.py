@@ -148,12 +148,7 @@ def get_args():
     parser.add_argument('--vision_range', type=int, default=600)
     parser.add_argument('--resolution', type=int, default=5)
     parser.add_argument('--du_scale', type=int, default=1)
-    parser.add_argument('--map_size_cm', type=int, default=3200)
-    parser.add_argument('--cat_pred_threshold', type=float, default=1.0)
-    parser.add_argument('--map_pred_threshold', type=float, default=1.0)
-    parser.add_argument('--exp_pred_threshold', type=float, default=1.0)
-    parser.add_argument('--collision_threshold', type=float, default=0.15)
-
+    parser.add_argument('--map_size_cm', type=int, default=2400)
     #相机俯仰角
     parser.add_argument('--agent_view_angle',type=float, default=-12.0)
 
