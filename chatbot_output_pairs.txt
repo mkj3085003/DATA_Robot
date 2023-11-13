@@ -132,3 +132,7 @@ user:Traceback (most recent call last):
     input_from_user = str(input("user:"))
 KeyboardInterrupt
 ^C
+
+# 如何解决避免机器人向顾客反复确认订单是否结束，
+I need a cup of coffee.
+I want a glass of milk and a juice for my daughter

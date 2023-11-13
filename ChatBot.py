@@ -2,30 +2,32 @@ import openai
 import json
 import time
 
-api_key = "sk-z2ztez3nzdjRerVojn5LcTSsE5JzXxuDWk3oRHvigO0RzPHV"
-openai.api_key = api_key
-openai.api_base = "https://openkey.cloud/v1"
+API_KEY = "sk-eQcx5qelSmgk6DhEKPGgNJ5IZvaWfPrF8mat2QWRomcPLGls"
+#22:00领取可用：
+#sk-Nqaedek5GkD6fC9SVyMwVTCEVeSIh5WB9EhQjAFWqjNdOZ0R
+#sk-qoXUG1ZD6BI2Lkfov8fOir8bI1dJkTd9hgEZhrHskejp15eM
+#sk-GTM6iyTPm0ALZaUUZL5Dq2LuKTHv6Qm01s4TNBAh6ACAsUM2
+#sk-eQcx5qelSmgk6DhEKPGgNJ5IZvaWfPrF8mat2QWRomcPLGls
+#sk-BCZt1tS0b1Q0bCIN1SPLpBNyFKLggQwkEfdhizw5iolDXywJ
+#sk-72xe4WItoRtddjKK2Vjl0SD06c1OQ3ee1ZbHKTXKj4n5CrpS
 
+openai.api_key = API_KEY
+openai.api_base = "https://openkey.cloud/v1"
+    
 class ChatBot():
     def __init__(self) -> None:
         self.conversation = []
         self.start_prompt = {'role': 'system', 'content':
- """You are a cafe waiter that collects the customer needs and order information for a Starbucks.the user will plays the role of a customer.
-If you judge that the customer has finished ordering:
-
-    first,Please confirm with the customer after you judge that the order is over use the following sentence :
-    "Do you have any other needs?" 
+                             f"""You are a cafe waiter that collects the customer needs and order information for a Starbucks.The user will play the role of a customer.
+                            The ordering conversation should end within 4 inquiries. Please use as few    conversations as possible to ask clearly the user's needs.
+                             If you judge that the customer has finished ordering,
+                             use the following sentence as the first sentence of your reply:
+                             'Ordering is over, I will repeat your order.'
                              
-    then,use the following sentence as the first sentence of your reply:
-    'Ordering is over, I will repeat your order.'
-                             
-Now, start a conversation.""",\
-'role':'assistant','content':"""
-welcome to starbucks!How can I assist you today?
-"""}
+                             Now, start a conversation.""",
+                             'role': 'assistant', 'content': """Welcome to Starbucks! How can I assist you today?"""
+                            }
         self.conversation.append(self.start_prompt)
-        # user_input = """'"""
-        # self.conversation.append({'role': 'user', 'content': user_input})
         self.end_prompt = {'role': 'system', 'content': """The conversation is over.
                          Please process the talk and return the guest's needs in JSON format."""}
         self.final_return = []
@@ -45,31 +47,32 @@ welcome to starbucks!How can I assist you today?
         return response.choices[0].message['content']
 
     def chat(self):
-        print('chat bot:',"welcome to starbucks!How can I assist you today?")
+        count=0
+        print('chat bot:', "Welcome to Starbucks! How can I assist you today?")
         while True:
             # 用户输入
+            count += 1
             input_from_user = str(input("user:"))
-            
+
             # 添加新的用户输入
             self.conversation.append({'role': 'user', 'content': input_from_user})
 
             # 模型回复
             reply = self.get_message_completion(self.conversation, temperature=0.3)
             print('chat bot:', reply)
-            
+
             # 判断是否结束对话
-            if self.if_end(reply):
+            if self.if_end(reply) or count > 5:#限制对话强制小于5轮 不然说个没完没了.
                 # 输出最终回复
-                print(reply)
-                
+                print("===============coversation is over===============")
+
                 # 结束对话
                 self.conversation.append({'role': 'assistant', 'content': reply})
                 self.final_return = self.get_message_completion(self.conversation, temperature=0.1)
                 self.conversation.append(self.end_prompt)
-                
+
                 # 返回整个对话历史
                 return self.conversation
-
 
     def get_json(self):
         reply = self.get_message_completion(self.conversation, temperature=0)
