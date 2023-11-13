@@ -133,6 +133,55 @@ user:Traceback (most recent call last):
 KeyboardInterrupt
 ^C
 
-# 如何解决避免机器人向顾客反复确认订单是否结束，
+# 如何解决避免机器人向顾客反复确认订单是否结束，如何完成物品辨识与匹配，如何具有记忆性。
 I need a cup of coffee.
 I want a glass of milk and a juice for my daughter
+
+### try-output:
+user:I want a glass of milk and a juice for my daughter.
+chat bot: Certainly! We have a variety of juices available. Which juice would you like for your daughter?
+user:orange.
+chat bot: Certainly! I will bring you a glass of milk and a glass of orange juice for your daughter. Is there anything else you would like to order?
+user:No,thanks
+chat bot: Alright, one glass of milk and one glass of orange juice coming right up!
+user:ok!
+chat bot: Great! One glass of milk and one juice coming right up. Is there a specific type of juice you would like for your daughter?
+user:no thanks.
+chat bot: Alright, just a glass of milk for you then. Anything else I can assist you with?
+user:no.
+chat bot: Alright, just a glass of milk for you then.
+===============coversation is over===============
+Alright, just a glass of milk for you then.
+response from gpt:
+ {
+  "order": {
+    "milk": 1
+  }
+}
+{'order': {'milk': 1}}
+
+
+order bot: It's my pleasure to serve you. What would you like to order? Here is our menu 
+['Cake', 'Walnut', 'Mangosteen', 'SourMilkDrink', 'Banana', 'Bernachon', 'Date', 'HamSausage', 'SesameSeedCake', 'Watermelon', 'NFCJuice', 'Dunian', 'StickyNotes', 'Garlic', 'TeaTray', 'Bread', 'SpringWater', 'Softdrink', 'Gum', 'Apple', 'CoconutMilk', 'YogurtDrink', 'Yogurt', 'MilkDrink', 'OrangeJuice', 'Coffee', 'ADMilk', 'CoconutWater', 'Orange', 'CandyCase', 'Chips', 'TennisBall', 'Milk']
+user:I want a glass of milk and a juice for my daughter.
+chat bot: Certainly! I can help you with that. What type of juice would you like for your daughter? We have options such as orange, apple, grape, and pineapple.
+user:OrangeJuice.
+chat bot: Certainly! I will bring you a glass of milk and a glass of orange juice for your daughter. Is there anything else you would like to order?
+user:No,thanks.
+chat bot: Alright, one glass of milk for you and a glass of orange juice for your daughter. Is there anything else I can assist you with?
+user:No thanks.
+chat bot: Alright, one glass of milk for you and one glass of juice for your daughter. Is there a specific type of juice you would like for your daughter, such as apple juice or orange juice?
+user:orange juice.
+chat bot: Sure, I'll get you a glass of milk and a glass of orange juice for your daughter.
+user:yes.
+chat bot: Great! One glass of milk and one glass of orange juice coming right up.
+===============coversation is over===============
+Great! One glass of milk and one glass of orange juice coming right up.
+response from gpt:
+ {
+  "object": "milk",
+  "num": 1
+}
+{'object': 'milk', 'num': 1}
+
+#### 不具有记忆性，且无法辨别菜单。
