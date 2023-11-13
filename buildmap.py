@@ -48,45 +48,15 @@ def get_args():
                                 -1: same as sim gpu, -2: cpu""")
 
     # Logging, loading models, visualization
-    parser.add_argument('--log_interval', type=int, default=10,
-                        help="""log interval, one log per n updates
-                                (default: 10) """)
-    parser.add_argument('--save_interval', type=int, default=1,
-                        help="""save interval""")
-    parser.add_argument('-d', '--dump_location', type=str, default="./tmp/",
-                        help='path to dump models and log (default: ./tmp/)')
-    parser.add_argument('--exp_name', type=str, default="exp1",
-                        help='experiment name (default: exp1)')
-    parser.add_argument('--save_periodic', type=int, default=5000,
-                        help='Model save frequency in number of updates')
-    parser.add_argument('--load', type=str, default="0",
-                        help="""model path to load,
-                                0 to not reload (default: 0)""")
-    parser.add_argument('-v', '--visualize', type=int, default=0,
-                        help="""1: Render the observation and
-                                   the predicted semantic map,
-                                2: Render the observation with semantic
-                                   predictions and the predicted semantic map
-                                (default: 0)""")
-    parser.add_argument('--print_images', type=int, default=0,
-                        help='1: save visualization as images')
+
 
     # Environment, dataset and episode specifications
-    parser.add_argument('-efw', '--env_frame_width', type=int, default=640,
-                        help='Frame width (default:640)')
-    parser.add_argument('-efh', '--env_frame_height', type=int, default=480,
-                        help='Frame height (default:480)')
+
     parser.add_argument('-fw', '--frame_width', type=int, default=640,
                         help='Frame width (default:160)')
     parser.add_argument('-fh', '--frame_height', type=int, default=480,
                         help='Frame height (default:120)')
-    parser.add_argument('-el', '--max_episode_length', type=int, default=1000,
-                        help="""Maximum episode length""")
-    parser.add_argument("--task_config", type=str,
-                        default="tasks/objectnav_gibson.yaml",
-                        help="path to config yaml containing task information")
-    parser.add_argument("--split", type=str, default="TG",
-                        help="dataset split (train | val | val_mini | TG) ")
+
     parser.add_argument('--camera_height', type=float, default=0,
                         help="agent camera height in cm")
     parser.add_argument('--fov', type=float, default=80.5,
@@ -178,7 +148,7 @@ def get_args():
     parser.add_argument('--vision_range', type=int, default=600)
     parser.add_argument('--resolution', type=int, default=5)
     parser.add_argument('--du_scale', type=int, default=1)
-    parser.add_argument('--map_size_cm', type=int, default=6400)
+    parser.add_argument('--map_size_cm', type=int, default=3200)
     parser.add_argument('--cat_pred_threshold', type=float, default=1.0)
     parser.add_argument('--map_pred_threshold', type=float, default=1.0)
     parser.add_argument('--exp_pred_threshold', type=float, default=1.0)
@@ -188,7 +158,7 @@ def get_args():
     parser.add_argument('--agent_view_angle',type=float, default=-12.0)
 
     parser.add_argument('--obs_threshold',type=float, default=1.0)
-    parser.add_argument('--agent_min_z',type=int, default=-120)
+    parser.add_argument('--agent_min_z',type=int, default=-110)
     parser.add_argument('--agent_max_z',type=int, default=70)
     parser.add_argument('--agent_height', type=float, default=0.72,
                         help="agent camera height in metres")
@@ -219,23 +189,33 @@ def get_obs(stub):
 def navigate():
     time.sleep(5)
     navigator = NavigationController(scene_manager)
-    target_x = 47  # Target x-coordinate
-    target_y = 0  # Target y-coordinate     #cm?
-    yaw = 30
+    target_x = 247  # Target x-coordinate
+    target_y = -10  # Target y-coordinate     #cm?
+    yaw = 270
     # Example navigation
-    result_scene = navigator.navigate_to_limit(target_x, target_y,yaw,200,100)
-    print("Navigation result:", result_scene.info)
+    result_scene = navigator.navigate_to_limit(target_x, target_y,yaw,100,100)
+    target_x = -50  # Target x-coordinate
+    target_y = 0  # Target y-coordinate     #cm?
+    yaw = 180
+    result_scene = navigator.navigate_to_limit(target_x, target_y,yaw,100,100)
+    
+    target_x = -50  # Target x-coordinate
+    target_y = 500  # Target y-coordinate     #cm?
+    yaw = 180
+    result_scene = navigator.navigate_to_limit(target_x, target_y,yaw,100,100)
     navigate_end = True
 
 def vis_map(plt,map2d,pose):
     plt.clf()
     
-    plt.imshow(map2d, cmap='viridis',vmin=0,vmax=15)  # viridis是一种颜色映射（colormap）
+    plt.imshow(map2d, cmap='viridis',vmin=0,vmax=15) 
     circle = plt.Circle((pose[1], pose[0]), radius=10.0,color="blue", fill=True)
     plt.gca().add_patch(circle)
 
     arrow = pose[0:2] + np.array([35, 0]).dot(np.array([[np.cos(pose[2]), np.sin(pose[2])], [-np.sin(pose[2]), np.cos(pose[2])]]))
     plt.plot([pose[1], arrow[1]], [pose[0], arrow[0]])
+    plt.text(8, 8, f'({pose[0]:d}, {pose[1]:f})')  # 显示机器人坐标
+
     plt.pause(0.005)
 
 
@@ -260,13 +240,10 @@ if __name__ == '__main__':
         map.update_map(depth,(247.,        500.,          3.1415926))
 
 
-
-
-
     else :
         scene_manager = SceneManager()
         camera=CameraController(scene_manager)
-        map_id = 3  # Map ID: 3 for the coffee shop
+        map_id =11  # Map ID: 3 for the coffee shop
         scene_manager.load_scene(map_id)
         time.sleep(5)
         num_scenes=1
@@ -280,19 +257,14 @@ if __name__ == '__main__':
         plt.figure(1) # create a plot
         mapbuilder=MapBuilder(args)
 
-        rgb,depth,seg =  get_obs(scene_manager.sim_client)
-        # camera.save_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Depth))
+        
         # camera.save_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Color))
 
-        depth = np.where(depth >= 599.0, 0.0, depth)
-        #show_pointcloud(rgb,depth,camera_matrix)
-        poses=np.array(scene_manager.get_pose_XYRad())
-        print(poses)
-        while not navigate_end :
+        while True:#not navigate_end :
             rgb,depth,seg =  get_obs(scene_manager.sim_client)
             poses=np.array(scene_manager.get_pose_XYRad())
             depth = np.where(depth >= 599.0, 0.0, depth)
-            mp=mapbuilder.update_map(depth,poses)
+            mp=mapbuilder.update_map(seg,depth,poses)
             x,y=mapbuilder.pos_to_index(poses[0],poses[1])
             vis_map(plt,mp,(x,y,poses[2]))
         

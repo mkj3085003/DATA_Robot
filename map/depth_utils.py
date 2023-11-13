@@ -112,7 +112,7 @@ def transform_pose(XYZ, current_pose):
     Output:
         XYZ : ...x3
     """
-    t = current_pose[2] -np.pi / 2.
+    t = current_pose[2] +np.pi / 2.
     rotation_matrix = np.array([[np.cos(t) ,0, np.sin(t)],
                                 [0         ,1, 0    ],
                                 [-np.sin(t),0, np.cos(t)]

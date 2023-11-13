@@ -17,7 +17,7 @@ def show_pointcloud(color_raw,depth_raw,camera):
     cam.intrinsic = intrinsic
    
     pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, cam.intrinsic)
-    pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    pcd.transform([[-1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
 
     # visualize:
     vis = o3d.visualization.Visualizer()
@@ -42,7 +42,7 @@ def get_point_cloud_of_view(color_raw,depth_raw,camera,downscal):
     # pcd=o3d.geometry.voxel_down_sample(pcd,downscal)    #下采样cm
     pcd=pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
 
-    return np.asarray(pcd.points)
+    return np.asarray(pcd.colors),np.asarray(pcd.points)
 
 
 def viz_3d(point):
@@ -75,7 +75,7 @@ class MapBuilder(object):
         self.agent_max_z = params['agent_max_z']#180
         self.z_bins = [self.agent_min_z, self.agent_max_z]
         self.du_scale = params['du_scale']#1
-        self.visualize = params['visualize']
+      
         self.obs_threshold = params['obs_threshold']
 
         #2400//5=480
@@ -118,10 +118,12 @@ class MapBuilder(object):
                 grid_map[grid_x, grid_y] += 1
         return grid_map
 
-    def update_map(self, depth, current_pose):
-
-        point_cloud = get_point_cloud_of_view(np.ones(shape=(depth.shape[0],depth.shape[1],3)),depth,self.camera_matrix,5)
-        
+    def update_map(self,seg, depth, current_pose):
+        new_seg = np.repeat(seg, 3, axis=2)
+     
+       # point_cloud = get_point_cloud_of_view(np.ones(shape=(depth.shape[0],depth.shape[1],3)),depth,self.camera_matrix,5)
+        point_seg ,point_cloud = get_point_cloud_of_view(new_seg,depth,self.camera_matrix,5)
+     
         agent_view = du.transform_camera_view(point_cloud,
                                               self.agent_height,
                                               self.agent_view_angle)
@@ -136,10 +138,8 @@ class MapBuilder(object):
 
 
 
-        cur_grid_map=np.where(cur_grid_map>0,max(cur_grid_map-4,0),0)
+        # cur_grid_map=np.where(cur_grid_map>0,max(cur_grid_map-4,0),0)
         self.map = self.map + cur_grid_map
-        
-        
 
 
         return self.map
