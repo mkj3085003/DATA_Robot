@@ -1,0 +1,237 @@
+prompt设计：
+prompt_front = {'role':'system', 'content':"""
+You are a cafe waiter robot that automatically collects seat order information for a Starbucks. Follow these steps to collect and format the seat order:
+
+1. Start by greeting the customers and asking how many people are dining together.
+2. Wait for the user to reply with the number of diners and their seating preferences, including details such as location, sharing, height, material, and any special requests.
+3. After collecting the information, you need to process it and output the seat order in JSON format. The JSON format should include the following fields:
+   - Capacity (an integer value, derived from the number of diners)
+   - Location (options: 'dont mind', 'Near the window', 'near the bar', 'center of the cafe')
+   - Share (options: 'dont mind sharing a table', 'alone')
+   - Height (options: 'high', 'low', 'dont mind')
+   - Material (options: 'wood', 'metal', 'sofa', 'dont mind')
+
+4. If any of the information is missing in the user's response, fill it with 'dont mind'.
+
+Please ensure that each value in the JSON is selected from the most similar content given in the customer's response. You can find these values in the customer's reply.
+
+When the customer's answer does not match the available options or is unclear, respond with an error message and politely request clarifications.
+
+Your response should be in one of two formats:
+1. A JSON file containing the seat order.
+2. An error message when the customer's response cannot be understood.
+
+"""}  # accumulate messages
+
+first_ask={'role':'assistant', 'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "}
+second_ask={'role':'assistant', 'content':'Do you have any seat preference? Such as position, height, material,or avoid the crowd etc.?'}
+prompt_end={'role':'system', 'content':"conversation is end.please return the json"}
+
+
+反应结果：
+Iterate 0
+{'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 1
+{'Capacity': 3, 'Location': 'dont mind', 'Share': 'dont mind sharing a table', 'Height': 'low', 'Material': 'sofa'}
+Iterate 2
+Iterate 3
+{'Capacity': 1, 'Location': 'Near the window', 'Share': 'Alone', 'Height': 'Dont mind', 'Material': 'Dont mind'}
+Iterate 4
+{'Capacity': 5, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 5
+{'Capacity': 2, 'Location': 'dont mind', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 6
+{'Capacity': 1, 'Location': 'near the bar', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 7
+{'Capacity': 4, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 8
+{'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 9
+{'Capacity': 6, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'high', 'Material': 'dont mind'}
+Iterate 10
+{'Capacity': 1, 'Location': 'quiet corner', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 11
+{'Capacity': 3, 'Location': 'dont mind', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 12
+{'Capacity': 1, 'Location': 'dont mind', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 13
+{'Capacity': 4, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 14
+{'Capacity': 2, 'Location': 'near the bar', 'Share': 'dont mind sharing a table', 'Height': 'high', 'Material': 'dont mind'}
+Iterate 15
+{'Capacity': 5, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 16
+Iterate 17
+{'Capacity': 7, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 18
+{'Capacity': 1, 'Location': 'Near the bookshelves', 'Share': 'Alone', 'Height': 'Dont mind', 'Material': 'Dont mind'}
+Iterate 19
+{'Capacity': 2, 'Location': 'near the bar', 'Share': 'dont mind sharing a table', 'Height': 'high', 'Material': 'dont mind'}
+Iterate 20
+{'Capacity': 6, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 21
+{'Capacity': 1, 'Location': 'near the open kitchen', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 22
+{'Capacity': 4, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 23
+{'Capacity': 1, 'Location': 'dont mind', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'sofa'}
+Iterate 24
+{'Capacity': 3, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 25
+{'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 26
+{'Capacity': 5, 'Location': 'near the bar', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 27
+{'Capacity': 1, 'Location': 'dont mind', 'Share': 'alone', 'Height': 'high', 'Material': 'dont mind'}
+Iterate 28
+{'Capacity': 6, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 29
+{'Capacity': 1, 'Location': 'Near the window', 'Share': 'Alone', 'Height': "Don't mind", 'Material': "Don't mind"}
+Iterate 30
+{'Capacity': 4, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 31
+{'Capacity': 1, 'Location': 'Near the cozy fireplace', 'Share': 'Alone', 'Height': "Don't mind", 'Material': "Don't mind"}
+Iterate 32
+{'Capacity': 3, 'Location': 'dont mind', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 33
+{'Capacity': 1, 'Location': 'Near the artwork', 'Share': 'Alone', 'Height': "Don't mind", 'Material': "Don't mind"}
+Iterate 34
+{'Capacity': 5, 'Location': 'dont mind', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 35
+{'Capacity': 1, 'Location': 'near the bar', 'Share': 'alone', 'Height': 'high', 'Material': 'dont mind'}
+Iterate 36
+{'Capacity': 4, 'Location': 'dont mind', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 37
+{'Capacity': 1, 'Location': 'Near the window', 'Share': 'Alone', 'Height': 'Dont mind', 'Material': 'Dont mind'}
+Iterate 38
+{'Capacity': 5, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 39
+{'Capacity': 1, 'Location': 'Near the live music stage', 'Share': 'Alone', 'Height': "Don't mind", 'Material': "Don't mind"}
+Iterate 40
+{'Capacity': 7, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+
+
+
+
+
+二次修改promt输出测试结果：
+Iterate 0
+first response:
+ {'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 1
+first response:
+ {
+  "Capacity": 3,
+  "Location": "dont mind",
+  "Share": "dont mind sharing a table",
+  "Height": "low",
+  "Material": "sofa"
+}
+proceed resopnse:
+ {'Capacity': 3, 'Location': 'dont mind', 'Share': 'dont mind sharing a table', 'Height': 'low', 'Material': 'sofa'}
+Iterate 2
+first response:
+ Hello, I am the intelligent service robot of TJark Cafe. I am here to assist you. How many people are dining together?
+proceed resopnse:
+ None
+Iterate 3
+first response:
+ {'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 4
+first response:
+ {'Capacity': 5, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 5, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 5
+first response:
+ {'Capacity': 2, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 2, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 6
+first response:
+ {'Capacity': 1, 'Location': 'near the bar', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 1, 'Location': 'near the bar', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 7
+first response:
+ {"Capacity": 4, "Location": "Near the window", "Share": "dont mind sharing a table", "Height": "dont mind", "Material": "dont mind"}
+proceed resopnse:
+ {'Capacity': 4, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 8
+first response:
+ {'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 9
+first response:
+ {'Capacity': 6, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'high', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 6, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'high', 'Material': 'dont mind'}
+Iterate 10
+first response:
+ {'Capacity': 1, 'Location': 'dont mind', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 1, 'Location': 'dont mind', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 11
+first response:
+ {
+  "Capacity": 3,
+  "Location": "dont mind",
+  "Share": "dont mind sharing a table",
+  "Height": "dont mind",
+  "Material": "dont mind"
+}
+proceed resopnse:
+ {'Capacity': 3, 'Location': 'dont mind', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 12
+first response:
+ {'Capacity': 1, 'Location': 'dont mind', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 1, 'Location': 'dont mind', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 13
+first response:
+ {
+  "Capacity": 4,
+  "Location": "center of the cafe",
+  "Share": "dont mind sharing a table",
+  "Height": "dont mind",
+  "Material": "dont mind"
+}
+proceed resopnse:
+ {'Capacity': 4, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 14
+first response:
+ {'Capacity': 2, 'Location': 'near the bar', 'Share': 'dont mind sharing a table', 'Height': 'high', 'Material': 'dont mind'}
+proceed resopnse:
+ {'Capacity': 2, 'Location': 'near the bar', 'Share': 'dont mind sharing a table', 'Height': 'high', 'Material': 'dont mind'}
+Iterate 15
+first response:
+ {"Capacity": 5, "Location": "Near the window", "Share": "dont mind sharing a table", "Height": "dont mind", "Material": "dont mind"}
+proceed resopnse:
+ {'Capacity': 5, 'Location': 'Near the window', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 16
+first response:
+ {
+  "Capacity": 1,
+  "Location": "Near the window",
+  "Share": "alone",
+  "Height": "dont mind",
+  "Material": "dont mind"
+}
+proceed resopnse:
+ {'Capacity': 1, 'Location': 'Near the window', 'Share': 'alone', 'Height': 'dont mind', 'Material': 'dont mind'}
+Iterate 17
+first response:
+ {
+  "Capacity": 7,
+  "Location": "center of the cafe",
+  "Share": "dont mind sharing a table",
+  "Height": "dont mind",
+  "Material": "dont mind"
+}
+proceed resopnse:
+ {'Capacity': 7, 'Location': 'center of the cafe', 'Share': 'dont mind sharing a table', 'Height': 'dont mind', 'Material': 'dont mind'}
