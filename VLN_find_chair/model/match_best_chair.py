@@ -75,8 +75,8 @@ class ChairList:
 
                 if dis < min_distance:
                     min_distance = dis
-                    self.best_chair = chair
-        return self.best_chair
+                    best_chair = chair
+        return best_chair
     
     def hamming_distance(str1, str2):
         assert len(str1) == len(str2), "Input strings must have the same length."
@@ -87,12 +87,12 @@ class ChairList:
         best_chairs=[] #取海明距离最小的座位
         if self.order_data["Share"]=="alone":
             best_empty=self.match_best_chair(self.empty_seat)
-            best_chair.append[best_empty]
+            best_chairs.append[best_empty]
         else :
             best_chair=self.match_best_chair(self.empty_chair)
-            if best_empty['id'] != best_chair['id']:
-                best_chairs.append[best_chair] 
-                #把非要alone和有其他需求的进行比较，一起加入best_chairs
+        if best_empty['id'] != best_chair['id']:
+            best_chairs.append[best_chair]
+         #把非要alone和有其他需求的进行比较，一起加入best_chairs
         return best_chairs
     
     # TO DO：需要更新分配后座位容量和座位是否有人
@@ -101,3 +101,13 @@ class ChairList:
         self.empty_chair
         # sitted = true
         self.empty_seat
+    # def update_empty_chair_list(self, sitted_seat):
+    #     for seat in sitted_seat:
+    #         # 找到分配座位后的椅子
+    #         assigned_chair = next((chair for chair in CHAIR_LIST if chair['id'] == seat['id']), None)
+    #         if assigned_chair:
+    #             # 标记座位已经被占用
+    #             assigned_chair['sitted'] = True
+    #             # 更新剩余空椅子列表
+    #             self.empty_seat = [chair for chair in CHAIR_LIST if not chair['sitted']]
+

@@ -51,6 +51,8 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
     return response.choices[0].message["content"]
 
 def get_completion_from_messages(messages, model="gpt-3.5-turbo", temperature=0):
+
+
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
