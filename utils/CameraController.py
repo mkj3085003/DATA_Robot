@@ -13,6 +13,11 @@ class CameraController:
         # GrabSim_pb2.CameraName.Head_Color
         # GrabSim_pb2.CameraName.Head_Depth
         # GrabSim_pb2.CameraName.Head_Segment
+        # GrabSim_pb2.CameraName.Chest_Color
+        # GrabSim_pb2.CameraName.Chest_Depth
+        # GrabSim_pb2.CameraName.Waist_Color
+        # GrabSim_pb2.CameraName.Waist_Depth
+
         action = GrabSim_pb2.CameraList(cameras=[camera_name], scene=scene_id)
         img_data = self.scene_manager.sim_client.Capture(action)
         return img_data
