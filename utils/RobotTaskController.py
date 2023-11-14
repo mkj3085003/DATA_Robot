@@ -88,10 +88,10 @@ class RobotTaskController:
         # 调用本地python仿真器对象的ControlRobot方法，控制机器人执行特定任务步骤
         scene = self.scene_manager.sim_client.ControlRobot(GrabSim_pb2.ControlInfo(scene=scene_id, type=task_type, action=action_step, content=message))
         if (str(scene.info).find("Action Success") > -1):
-            print(scene.info)
+            # print(scene.info)
             return True
         else:
-            print(scene.info)
+            # print(scene.info)
             return False
 
 

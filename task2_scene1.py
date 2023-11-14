@@ -6,6 +6,9 @@ from utils.RobotTaskController import RobotTaskController
 from utils.SceneManager import SceneManager
 from utils.PedestrianController import PedestrianController
 
+from VLN_find_chair.model.InquireChairNeeds import *
+from VLN_find_chair.model.match_best_chair import *
+
 '''场景一：咖啡厅服务员位于吧台处等待，识别顾客靠近，为行人匹配座位'''
 
 
@@ -156,7 +159,18 @@ while True:
 robot_task_controller = RobotTaskController(scene_manager)
 robot_task_controller.display_text_bubble("您好，您需要什么帮助吗？")
 time.sleep(2)
-pedestrian_controller.talk_walkers(detected_customer, " I'm here alone.I'd like a seat by the fireplace for a warm and cozy ambiance.")
+talk_walker_response = " I'm here alone.I'd like a seat by the fireplace for a warm and cozy ambiance."
+pedestrian_controller.talk_walkers(detected_customer, talk_walker_response)
+#执行输出
+inquirer = InquireChairNeeds()  # 初始化对话类
+response = inquirer.initiate_conversation()  # 调用对话函数
+res = inquirer.get_completion_from_messages(talk_walker_response)#开始匹配
+
+chairSelector = ChairList()
+chairSelector.encode_feature(res)
+best = chairSelector.find_the_best()
+
+
 
 
 

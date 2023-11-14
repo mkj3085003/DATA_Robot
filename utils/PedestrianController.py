@@ -83,14 +83,14 @@ class PedestrianController:
         scene = self.scene_manager.sim_client.ControlRobot(
             GrabSim_pb2.ControlInfo(scene=scene_id, type=type, action=action, content=message))
         if (str(scene.info).find("Action Success") > -1):
-            print(scene.info)
+            # print(scene.info)
             return True
         else:
-            print(scene.info)
+            # print(scene.info)
             return False
 
     def talk_walkers(self, walker_name, content, scene_id=0):
-        print('------------------talk_walkers----------------------')
+        # print('------------------talk_walkers----------------------')
         talk_content = walker_name + ":" + content
         self.control_robot_action(0, 3, talk_content, scene_id)
 

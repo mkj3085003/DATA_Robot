@@ -1,12 +1,7 @@
 import numpy as np
 import math
 import json
-CHAIR_LIST=[]
-# TO DO:获取Starbucks里所有座椅的类型坐标以及对应的位置及特征存储在find_chair\model\data_chair.json，
-# 补充完CHAIR_LIST的值
-with open("..\data\data_chair.json", 'r') as json_file:
-    json_str = json_file.read()
-    CHAIR_LIST = json.loads(json_str)
+
 # 打开JSON文件并加载数据
 
 CHAIR_NUM=30
@@ -35,10 +30,35 @@ FEATURE_DESCRIPTION={
 
 class ChairList:
     def __init__(self):
-        self.order_data
-        self.empty_seat=[seat for seat in CHAIR_LIST if not seat['sitted']]#完全没有人坐
-        self.empty_chair=[chair for chair in CHAIR_LIST if  not chair['Capacity']]#有空位
-                
+        self.CHAIR_LIST = []
+        # TO DO:获取Starbucks里所有座椅的类型坐标以及对应的位置及特征存储在find_chair\model\data_chair.json，
+        # 补充完CHAIR_LIST的值
+        filepath = "D:\\bigModelRobot\\BigRobot\\Plugins\\HarixSim\\python\\VLN_find_chair\\data\\zhuozi.json"
+        with open(filepath, 'r') as json_file:
+            json_str = json_file.read()
+            self.CHAIR_LIST = json.loads(json_str)
+        self.total_empty_chair=[seat for seat in self.CHAIR_LIST if seat['Capacity']>0]#完全没有人坐
+        self.empty_chair=[chair for chair in self.CHAIR_LIST if  not chair['Capacity']]#有空位
+
+    def decode_feature(self, json_str):
+        #返回orderdata
+        capacity=0
+        str="0000000"
+        try:
+            parsed_json = json.loads(json_str)
+            str[0:2] = "01" if parsed_json['seat_preference'] == "near window" else "00"
+            capacity = parsed_json['number_of_people']
+        except:
+            pass
+
+        order_data={}
+        order_data["Location"]=str[0:2]
+        order_data["Share"]=str[2]
+        order_data["Height"]=str[3:5]
+        order_data["Material"]=str[5:7]
+        order_data["Capacity"]=capacity
+        order_data["Feature"]=str
+        return order_data
 
     def encode_feature(self,order_data):
         self.num=int(order_data['Capacity'])
@@ -61,46 +81,49 @@ class ChairList:
         return chair['position'] 
     
     def get_empty_seat(self):
-        return self.empty_seat
+        return self.total_empty_chair
     
-    def match_best_chair(self,empty_chairs):
+    def match_best_chair(self,empty_chairs, demand_feature):
+        min_distance = 7
         for chair in empty_chairs:
-            if chair['Capacity']>= self.num:
-                dis=self.hamming_distance(chair['feature'],self.order_feature)
+            if chair['Capacity']>= demand_feature['Capacity']:
+                dis=self.hamming_distance(chair['feature'],demand_feature["Feature"])
                 # 如果不介意，dontmind编码距离减去1
-                if FEATURE_DESCRIPTION[self.order_data["Location"]]=="00":dis-1
-                if FEATURE_DESCRIPTION[self.order_data["Share"]]=="0":dis-1
-                if FEATURE_DESCRIPTION[self.order_data["Height"]]=="00":dis-1
-                if FEATURE_DESCRIPTION[self.order_data["Material"]]=="00":dis-1
+                if demand_feature["Location"]=="00":
+                    dis-1
+                if demand_feature["Share"]=="0":
+                    dis-1
+                if demand_feature["Height"]=="00":
+                    dis-1
+                if demand_feature["Material"]=="00":
+                    dis-1
 
                 if dis < min_distance:
                     min_distance = dis
                     best_chair = chair
         return best_chair
     
-    def hamming_distance(str1, str2):
+    def hamming_distance(self, str1, str2):
         assert len(str1) == len(str2), "Input strings must have the same length."
         return sum(bit1 != bit2 for bit1, bit2 in zip(str1, str2))   
     
-    def find_the_best(self):
+    def find_the_best(self,demand_feature_ordered):
         min_distance=7 #7位全不一样
-        best_chairs=[] #取海明距离最小的座位
-        if self.order_data["Share"]=="alone":
-            best_empty=self.match_best_chair(self.empty_seat)
-            best_chairs.append[best_empty]
+        if demand_feature_ordered["Share"]=="0":
+            best_chair=self.match_best_chair(self.total_empty_chair,demand_feature_ordered)
+
         else :
-            best_chair=self.match_best_chair(self.empty_chair)
-        if best_empty['id'] != best_chair['id']:
-            best_chairs.append[best_chair]
+            best_chair=self.match_best_chair(self.empty_chair,demand_feature_ordered)
+
          #把非要alone和有其他需求的进行比较，一起加入best_chairs
-        return best_chairs
+        return best_chair
     
     # TO DO：需要更新分配后座位容量和座位是否有人
     def updata_empty_chair_list(self,sitted_seat):
         # 'Capacity' -ord_data['Capacity']
         self.empty_chair
         # sitted = true
-        self.empty_seat
+        self.total_empty_chair
     # def update_empty_chair_list(self, sitted_seat):
     #     for seat in sitted_seat:
     #         # 找到分配座位后的椅子
@@ -109,5 +132,11 @@ class ChairList:
     #             # 标记座位已经被占用
     #             assigned_chair['sitted'] = True
     #             # 更新剩余空椅子列表
-    #             self.empty_seat = [chair for chair in CHAIR_LIST if not chair['sitted']]
+    #             self.total_empty_chair = [chair for chair in CHAIR_LIST if not chair['sitted']]
 
+if __name__ == '__main__':
+    # 测试
+    chair_list = ChairList()
+    ordered_feature = chair_list.decode_feature("{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }")
+    chair = chair_list.find_the_best(ordered_feature)
+    print(chair)
