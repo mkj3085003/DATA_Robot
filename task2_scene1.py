@@ -5,9 +5,12 @@ import random
 from utils.RobotTaskController import RobotTaskController
 from utils.SceneManager import SceneManager
 from utils.PedestrianController import PedestrianController
+from utils.NavigationController import NavigationController
 
 from VLN_find_chair.model.InquireChairNeeds import *
 from VLN_find_chair.model.match_best_chair import *
+
+
 
 '''场景一：咖啡厅服务员位于吧台处等待，识别顾客靠近，为行人匹配座位'''
 
@@ -166,10 +169,16 @@ inquirer = InquireChairNeeds()  # 初始化对话类
 response = inquirer.initiate_conversation()  # 调用对话函数
 res = inquirer.get_completion_from_messages(talk_walker_response)#开始匹配
 
-chairSelector = ChairList()
-chairSelector.encode_feature(res)
-best = chairSelector.find_the_best()
+chair_list = ChairList()
+ordered_feature = chair_list.decode_feature("{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }")
+chair = chair_list.find_the_best(ordered_feature)
+print(chair)
 
+#带领
+navi = NavigationController(scene_manager)
+navi.navigate_to(chair["position"][0],chair["position"][1],end_yaw)
+#行人走向目标椅子
+pedestrian_controller.control_one_pedestrian(walker_id, bar_x, bar_y, end_yaw, walker_speed=200, scene_id=0)
 
 
 
