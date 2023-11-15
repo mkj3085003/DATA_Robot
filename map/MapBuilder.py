@@ -3,55 +3,8 @@ import map.depth_utils as du
 import map.rotation_utils as ru
 import open3d as o3d
 import matplotlib.pyplot as plt
-def show_pointcloud(color_raw,depth_raw,camera):
-    # create an rgbd image object:
-    color = o3d.geometry.Image((color_raw).astype(np.uint8))
-    depth=o3d.geometry.Image((depth_raw).astype(np.float32))
-    
-    rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(color, depth,depth_scale=100.0,depth_trunc=10, convert_rgb_to_intensity=False)
-    # use the rgbd image to create point cloud:
-
-    intrinsic = o3d.camera.PinholeCameraIntrinsic(camera.w, camera.h, camera.fx,camera.fy, camera.cx, camera.cy)
-    intrinsic.intrinsic_matrix = [[camera.fx, 0, camera.cx], [0, camera.fy, camera.cy], [0, 0, 1]]
-    cam = o3d.camera.PinholeCameraParameters()
-    cam.intrinsic = intrinsic
-   
-    pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, cam.intrinsic)
-    pcd.transform([[-1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-
-    # visualize:
-    vis = o3d.visualization.Visualizer()
-    vis.create_window(width=camera.w,height=camera.h)
-    vis.add_geometry(pcd)
-    
-    ctr = vis.get_view_control()
-    ctr.convert_from_pinhole_camera_parameters(cam)
-    
-    vis.run()
-
-def get_point_cloud_of_view(color_raw,depth_raw,camera,downscal):
-    color = o3d.geometry.Image((color_raw).astype(np.uint8))
-    depth=o3d.geometry.Image((depth_raw).astype(np.float32))
-    rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(color, depth,depth_scale=1.0,depth_trunc=600, convert_rgb_to_intensity=False)
-    intrinsic = o3d.camera.PinholeCameraIntrinsic(camera.w, camera.h, camera.fx,camera.fy, camera.cx, camera.cy)
-    intrinsic.intrinsic_matrix = [[camera.fx, 0, camera.cx], [0, camera.fy, camera.cy], [0, 0, 1]]
-    cam = o3d.camera.PinholeCameraParameters()
-    cam.intrinsic = intrinsic
-    
-    pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, cam.intrinsic)
-    # pcd=o3d.geometry.voxel_down_sample(pcd,downscal)    #下采样cm
-    pcd=pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-
-    return np.asarray(pcd.colors),np.asarray(pcd.points)
-
-
-def viz_3d(point):
-    # 可视化点云
-    point_cloud = o3d.geometry.PointCloud()
-    point_cloud.points = o3d.utility.Vector3dVector(point)
-    coordinate_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=20.0, origin=[0, 0, 0])
-    o3d.visualization.draw_geometries([point_cloud,coordinate_frame])
-
+from map.pcd_process import *
+import GrabSim_pb2
 
 class MapBuilder(object):
     def pos_to_index(self,x,y):
@@ -86,21 +39,59 @@ class MapBuilder(object):
         self.agent_view_angle = params['agent_view_angle']
         return
     
+    '''
+    input : scene_manager
+    usage : get walkers' loc in current view
+    return : list of walkers' centers in world space (x,y)
+    '''
+    def get_walkers_loc(self,scene_manager):
+        stub=scene_manager.sim_client
+        current_pose=np.array(scene_manager.get_pose_XYRad())
+        images=[] 
+        images= stub.Capture(GrabSim_pb2.CameraList(scene=0, cameras=[  \
+            GrabSim_pb2.CameraName.Head_Depth, \
+            GrabSim_pb2.CameraName.Head_Segment ])).images
+        
+        depth = np.frombuffer(images[0].data, dtype=images[0].dtype).reshape(
+            (images[0].height, images[0].width, images[0].channels))
+        seg = np.frombuffer(images[1].data, dtype=images[1].dtype).reshape(
+            (images[1].height, images[1].width, images[1].channels))
+        
+        colors=seg_to_rgb(seg)
+        
+        point_seg ,point_cloud = get_point_cloud_of_view(colors,depth,self.camera_matrix)
+    
+        agent_view = du.transform_camera_view(point_cloud,
+                                              self.agent_height,
+                                              self.agent_view_angle)
+        geocentric_pc = du.transform_pose(agent_view, current_pose)
+
+        point_cloud = o3d.geometry.PointCloud()
+        point_cloud.points = o3d.utility.Vector3dVector(geocentric_pc)
+        point_cloud.colors=o3d.utility.Vector3dVector(point_seg)
+        
+        pcd=get_pcd_by_id(point_cloud,251)#行人
+
+        # o3d.visualization.draw_geometries([pcd])
+        cluster_centers = cluster_and_get_center(pcd, eps=30, min_points=8,vis=False)
+        return cluster_centers[:,[0,1]]
 
 
-    def to_3d_grid_map(self,points,z_min_cm,z_max_cm):
-        M   =  self.map_size//self.resolution
-        H   =  (z_max_cm-z_min_cm)//self.resolution
-        grid_map=np.zeros((M, M, H+1), dtype=np.int)
-        for point in points:
-            x, z, y = point
-            grid_x,grid_y =self.pos_to_index(x,y)
-            grid_z = (z-z_min_cm)//self.resolution
 
-            # 确保点在 grid map 范围内
-            if 0 <= grid_x < M and 0 <= grid_y < M and 0 <= grid_z <= H:
-                grid_map[grid_x, grid_y, grid_z] += 1
-        return grid_map
+
+    # def to_3d_grid_map(self,points,z_min_cm,z_max_cm):
+    #     M   =  self.map_size//self.resolution
+    #     H   =  (z_max_cm-z_min_cm)//self.resolution
+    #     grid_map=np.zeros((M, M, H+1), dtype=np.int)
+    #     for point in points:
+    #         x, z, y = point
+    #         grid_x,grid_y =self.pos_to_index(x,y)
+    #         grid_z = (z-z_min_cm)//self.resolution
+
+    #         # 确保点在 grid map 范围内
+    #         if 0 <= grid_x < M and 0 <= grid_y < M and 0 <= grid_z <= H:
+    #             grid_map[grid_x, grid_y, grid_z] += 1
+    #     return grid_map
 
 
 
@@ -118,9 +109,13 @@ class MapBuilder(object):
                 grid_map[grid_x, grid_y] += 1
         return grid_map
 
+
+
     def update_map(self,seg, depth, current_pose):
-        new_seg = np.repeat(seg, 3, axis=2)
-     
+       
+
+        #  将seg数组映射到颜色
+        new_seg=seg_to_rgb(seg)
        # point_cloud = get_point_cloud_of_view(np.ones(shape=(depth.shape[0],depth.shape[1],3)),depth,self.camera_matrix,5)
         point_seg ,point_cloud = get_point_cloud_of_view(new_seg,depth,self.camera_matrix,5)
      
@@ -130,10 +125,10 @@ class MapBuilder(object):
 
         # viz_3d(point_cloud)
         geocentric_pc = du.transform_pose(agent_view, current_pose)
-        # for i in range(len(geocentric_pc)):
-        #     if geocentric_pc[i][1]>70 or geocentric_pc[i][1]<-120:
-        #         geocentric_pc[i]=np.zeros((1,3))
-        # viz_3d(geocentric_pc)
+        
+        # viz_segment_3d(point_seg,geocentric_pc)
+
+
         cur_grid_map=self.to_2d_grid_map(geocentric_pc,self.agent_min_z,self.agent_max_z)
 
 

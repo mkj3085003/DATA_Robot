@@ -22,7 +22,7 @@ class CameraController:
             plt.imshow(d, cmap="gray",vmin=0,vmax=d.max())
             plt.colorbar()  # 添加颜色条
         else :
-            plt.imshow(d)
+            plt.imshow(d,cmap=None,vmin=0,vmax=255)
         plt.show()
 
     def save_image(self, img_data):
