@@ -13,6 +13,12 @@ class InquireChairNeeds:
         self.prompt_front = {'role': 'system', 'content': """
             You are a cafe waiter robot that automatically collects seat order information for a Starbucks...
             [此处为提供的对话流程文本，具体内容请填充到这里]
+            - Location   (options: 'dont mind', 'Near the window', 'near the bar', 'center of the cafe')
+            - Share      (options: 'dont mind sharing a table', 'alone')
+            - Height     (options: 'high', 'low', 'dont mind')
+            - Material   (options: 'soft', 'hard', 'dont mind')
+            - number_of_people (int)
+            you can only select the items in the options lists.
         """}
 
         self.first_ask = {'role': 'assistant',
@@ -20,17 +26,28 @@ class InquireChairNeeds:
         self.second_ask = {'role': 'assistant',
                            'content': 'Do you have any seat preference? Such as position, height, material, or avoiding the crowd, etc.?'}
         self.prompt_end = {'role': 'user', 'content': "Conversation is finished. Please return the JSON."}
-        self.prompt_json = {'role': 'assistant', 'content': "{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }"}
+        self.prompt_json_second = {'role': 'assistant', 'content': "{\n  \"Location\": \"Near the window\",\n Share:\"dont mind sharing a table\",\n   \"Height\":\"dont mind\" \"Material\":\"dont mind\"  \"number_of_people\": 4\n }"}
+
+        self.prompt_json_third = {'role': 'assistant', 'content': "{\n  \"Location\": \"dont mind\",\n Share:\"dont mind sharing a table\",\n   \"Height\":\"dont mind\" \"Material\":\"dont mind\"  \"number_of_people\": 1\n }"}
+        
 
     def get_completion(self, prompt, model="gpt-3.5-turbo"):
         a = 1
         mymessage = [
-            self.prompt_front, self.first_ask,  # 进行首次问候及问题提问
+            self.prompt_front, 
+            self.first_ask,  # 进行首次问候及问题提问
             {'role': 'user', 'content': "4"},  # 模拟用户回答第一个问题
             self.second_ask,  # 向用户提出第二个问题
             {'role': 'user', 'content': "Prefer a table near the window."},  # 模拟用户回答第二个问题
             self.prompt_end,  # 结束对话
-            self.prompt_json,
+            self.prompt_json_second,
+            self.first_ask,  # 进行首次问候及问题提问
+            {'role': 'user', 'content': "1"},  # 模拟用户回答第一个问题
+            self.second_ask,  # 向用户提出第二个问题
+            {'role': 'user', 'content': "I'd like a seat by the firecamp."},  # 模拟用户回答第二个问题
+            self.prompt_end,  # 结束对话
+            self.prompt_json_third,
+
             {"role": "user", "content": prompt},
             self.prompt_end,
         ]
@@ -43,7 +60,7 @@ class InquireChairNeeds:
             messages=messages,
             temperature=temperature  # 控制模型输出的随机程度
         )
-        content = response.choices[0].message['content']
+        content = response
         # ...
         # 剩余的处理逻辑，用于解析对话内容和生成回复
         # ...
@@ -64,6 +81,9 @@ class InquireChairNeeds:
 
 
 if __name__ == '__main__':
+    talk_walker_response = " I'm here alone.I'd like a seat by the firecamp."
+    #执行输出
     inquirer = InquireChairNeeds()  # 初始化对话类
-    response = inquirer.initiate_conversation()  # 调用对话函数
-    print('Proceed response:\n', response)
+    # response = inquirer.initiate_conversation()  # 调用对话函数
+    res = inquirer.get_completion(talk_walker_response)#开始匹配
+    print(res)

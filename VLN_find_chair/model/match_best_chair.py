@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import json
+from InquireChairNeeds import InquireChairNeeds
 
 # 打开JSON文件并加载数据
 
@@ -37,19 +38,76 @@ class ChairList:
         with open(filepath, 'r') as json_file:
             json_str = json_file.read()
             self.CHAIR_LIST = json.loads(json_str)
-        self.total_empty_chair=[seat for seat in self.CHAIR_LIST if seat['Capacity']>0]#完全没有人坐
-        self.empty_chair=[chair for chair in self.CHAIR_LIST if  not chair['Capacity']]#有空位
+        self.total_empty_chair=list(self.CHAIR_LIST)#完全没有人坐
+        self.empty_chair=list(self.CHAIR_LIST)#有空位
 
     def decode_feature(self, json_str):
+        '''FEATURE_DESCRIPTION={
+            #总共7位二进制编码
+            #location
+            "dont mind":"00", 
+            "Near the window":"01", 
+            "near the bar":"10",
+            #share
+            "dont mind sharing a table":"0", 
+            "alone":"1",
+            #height
+            "dont mind":"00",
+            "high":"01", #高度这里空了一个11码……导致了有2^5个空值……但便于比较
+            "low":"10",
+            #metiral
+            "dont mind":"00",
+            "hard":"01", 
+            "soft":"10"
+            返回none代表不知道有多少人，重新询问
+        }'''
         #返回orderdata
         capacity=0
-        str="0000000"
+        str=""
+        parsed_json = json.loads(json_str)
         try:
-            parsed_json = json.loads(json_str)
-            str[0:2] = "01" if parsed_json['seat_preference'] == "near window" else "00"
+            if parsed_json['Location'] == "near window":
+                str += "01"
+            elif parsed_json['Location'] == "near bar":
+                str += "10"
+            else:
+                str += "00"
+        except:
+            str += "00"
+
+        try:
+            if parsed_json['Share'] == "alone":
+                str += "1"
+            else:
+                str += "0"
+        except:
+            str += "0"
+
+        try:
+            if parsed_json['Height'] == "high":
+                str += "01"
+            elif parsed_json['Height'] == "low":
+                str += "10"
+            else:
+                str += "00"
+        except:
+            str += "00"
+
+        try:
+            if parsed_json['Material'] == "hard":
+                str += "01"
+            elif parsed_json['Material'] == "soft":
+                str += "10"
+            else:
+                str += "00"
+
+        except:
+            str += "00"
+
+        try:
             capacity = parsed_json['number_of_people']
         except:
-            pass
+            capacity = 1
 
         order_data={}
         order_data["Location"]=str[0:2]
@@ -119,11 +177,9 @@ class ChairList:
         return best_chair
     
     # TO DO：需要更新分配后座位容量和座位是否有人
-    def updata_empty_chair_list(self,sitted_seat):
+    def update_chair_list(self,seat_id,capacity):
         # 'Capacity' -ord_data['Capacity']
-        self.empty_chair
-        # sitted = true
-        self.total_empty_chair
+        
     # def update_empty_chair_list(self, sitted_seat):
     #     for seat in sitted_seat:
     #         # 找到分配座位后的椅子
@@ -133,10 +189,35 @@ class ChairList:
     #             assigned_chair['sitted'] = True
     #             # 更新剩余空椅子列表
     #             self.total_empty_chair = [chair for chair in CHAIR_LIST if not chair['sitted']]
+        # originalChairData = next((item for item in ChairList if item['id'] == seat_id), None)
+        emptyChairData = next((item for item in self.CHAIR_LIST if item['id'] == seat_id), None)
+        emptyChairData['Capacity'] = emptyChairData['Capacity'] - capacity
+        totalEmptyChairData = next((item for item in self.total_empty_chair if item['id'] == seat_id), None)
+        if totalEmptyChairData != None:
+            self.total_empty_chair.remove(totalEmptyChairData)
+
+
+    #TODO 人走了之后的管理
+
 
 if __name__ == '__main__':
-    # 测试
-    chair_list = ChairList()
-    ordered_feature = chair_list.decode_feature("{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }")
+    talk_walker_response = " I'm here alone.I'd like a seat by the firecamp."
+    #执行输出
+    inquirer = InquireChairNeeds()  # 初始化对话类
+
+    while True:
+        # response = inquirer.initiate_conversation()  # 调用对话函数
+        res = inquirer.get_completion(talk_walker_response)#开始匹配
+        print(res)
+        # 测试
+        chair_list = ChairList()
+        ordered_feature = chair_list.decode_feature(res)
+        if ordered_feature!=None:
+            break
+
+    
+    print(ordered_feature)
     chair = chair_list.find_the_best(ordered_feature)
     print(chair)
+    chair_list.update_chair_list(chair["id"],ordered_feature["Capacity"])
+    print(chair_list.empty_chair)
