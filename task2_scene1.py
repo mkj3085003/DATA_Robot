@@ -178,7 +178,7 @@ print(chair)
 navi = NavigationController(scene_manager)
 navi.navigate_to(chair["position"][0],chair["position"][1],end_yaw)
 #行人走向目标椅子
-pedestrian_controller.control_one_pedestrian(walker_id, bar_x, bar_y, end_yaw, walker_speed=200, scene_id=0)
+pedestrian_controller.control_one_pedestrian(detected_customer,chair["position"][0],chair["position"][1], walker_speed=200, scene_id=0)
 
 
 

@@ -34,7 +34,7 @@ class InquireChairNeeds:
             {"role": "user", "content": prompt},
             self.prompt_end,
         ]
-        response = openai.get_completion_from_messages(mymessage, temperature=0.3)
+        response = self.get_completion_from_messages(mymessage, temperature=0.3)
         return response.choices[0].message["content"]
 
     def get_completion_from_messages(self, messages, model="gpt-3.5-turbo", temperature=0):
