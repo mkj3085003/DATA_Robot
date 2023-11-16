@@ -33,7 +33,7 @@ class ChairList:
         self.CHAIR_LIST = []
         # TO DO:获取Starbucks里所有座椅的类型坐标以及对应的位置及特征存储在find_chair\model\data_chair.json，
         # 补充完CHAIR_LIST的值
-        filepath = "../data/data_chair.json"
+        filepath = "D:\\bigModelRobot\BigRobot\Plugins\HarixSim\python\VLN_find_chair\data\zhuozi.json"
         with open(filepath, 'r') as json_file:
             json_str = json_file.read()
             self.CHAIR_LIST = json.loads(json_str)

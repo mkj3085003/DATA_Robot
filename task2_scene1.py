@@ -37,7 +37,7 @@ def detect_customer_proximity(walkers):
 
         distance = ((walker_x - robot_x) ** 2 + (walker_y - robot_y) ** 2) ** 0.5
         if distance <= detection_range:
-            detected_customer = walker.name
+            detected_customer = walker
             return detected_customer
 
 '''
@@ -103,7 +103,7 @@ print(walker_list)
 for pedestrian_data in walker_list:
     pedestrian_id = pedestrian_data['walker_id']
     auto_control=True
-    pedestrian_controller.control_one_pedestrian_autowalk(pedestrian_id, autowalker=auto_control, walker_speed=200, scene_id=0)
+    pedestrian_controller.control_one_pedestrian_autowalk(pedestrian_id, autowalker=auto_control, walker_speed=50, scene_id=0)
 
 # # 创建并启动一个线程来检测顾客靠近机器人
 # stop_event = threading.Event()  # Event to stop the thread
@@ -163,12 +163,12 @@ robot_task_controller = RobotTaskController(scene_manager)
 robot_task_controller.display_text_bubble("您好，您需要什么帮助吗？")
 time.sleep(2)
 talk_walker_response = " I'm here alone.I'd like a seat by the fireplace for a warm and cozy ambiance."
-pedestrian_controller.talk_walkers(detected_customer, talk_walker_response)
+pedestrian_controller.talk_walkers(detected_customer.name, talk_walker_response)
 #执行输出
 inquirer = InquireChairNeeds()  # 初始化对话类
-response = inquirer.initiate_conversation()  # 调用对话函数
-res = inquirer.get_completion_from_messages(talk_walker_response)#开始匹配
-
+# response = inquirer.initiate_conversation()  # 调用对话函数
+# res = inquirer.get_completion_from_messages(talk_walker_response)#开始匹配
+res = "test!"
 chair_list = ChairList()
 ordered_feature = chair_list.decode_feature("{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }")
 chair = chair_list.find_the_best(ordered_feature)
@@ -176,9 +176,11 @@ print(chair)
 
 #带领
 navi = NavigationController(scene_manager)
-navi.navigate_to(chair["position"][0],chair["position"][1],end_yaw)
+print(navi.navigate_to(chair["position"][0],chair["position"][1],end_yaw))
+# Sleep(1000)
+time.sleep(5.0)
 #行人走向目标椅子
-pedestrian_controller.control_one_pedestrian(detected_customer,chair["position"][0],chair["position"][1], walker_speed=200, scene_id=0)
+pedestrian_controller.control_one_pedestrian(walker_id,chair["position"][0],chair["position"][1],end_yaw, walker_speed=200, scene_id=0)
 
 
 
