@@ -160,7 +160,7 @@ walker = None
 detected_customer = None
 while detected_customer is None:
     for point in points:
-        navi.navigate_to(point[0],point[1],0)
+        navi.navigate_to_limit(point[0],point[1],0,100,100)
         current_scene = scene_manager.Observe(0)
         detected_customer = detect_customer_proximity(current_scene.walkers)
         if detected_customer:
@@ -175,13 +175,13 @@ while detected_customer is None:
 robot_task_controller = RobotTaskController(scene_manager)
 robot_task_controller.display_text_bubble("您好，您需要什么帮助吗？")
 time.sleep(2)
-talk_walker_response = " I'm here alone.I'd like a seat by the fireplace for a warm and cozy ambiance."
+talk_walker_response = " I'm here alone.I'd like a seat by the window."
 pedestrian_controller.talk_walkers(detected_customer, talk_walker_response)
 #执行输出
 inquirer = InquireChairNeeds()  # 初始化对话类
-response = inquirer.initiate_conversation()  # 调用对话函数
-# res = inquirer.get_completion_from_messages(talk_walker_response)#开始匹配暂时先不慌
-res ="test"
+# response = inquirer.initiate_conversation()  # 调用对话函数
+res = inquirer.get_completion_from_messages(talk_walker_response)#开始匹配暂时先不慌
+
 chair_list = ChairList()
 ordered_feature = chair_list.decode_feature("{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }")
 chair = chair_list.find_the_best(ordered_feature)
@@ -189,7 +189,7 @@ print(chair)
 
 #带领
 navi = NavigationController(scene_manager)
-navi.navigate_to(chair["position"][0],chair["position"][1],0)
+navi.navigate_to_limit(chair["position"][0],chair["position"][1],200,100)
 #行人走向目标椅子
 pedestrian_controller.control_one_pedestrian(detected_customer,chair["position"][0],chair["position"][1], walker_speed=50, scene_id=0)
 
