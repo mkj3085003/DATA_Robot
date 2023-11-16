@@ -2,9 +2,6 @@ import sys
 import time
 import grpc
 
-sys.path.append('./')
-sys.path.append('../')
-
 import GrabSim_pb2_grpc
 import GrabSim_pb2
 
@@ -64,6 +61,31 @@ class SceneManager:
             f"timestep:{scene.timestep}, timestamp:{scene.timestamp}\n"
             f"collision:{scene.collision}, info:{scene.info}")
         return scene
+    
+    def show_env_info(self,scene_id=0):
+        scene = self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
+        print('------------------show_env_info----------------------')
+        print(
+            f"location:{[scene.location.X, scene.location.Y]}, rotation:{scene.rotation.Yaw}\n",
+            f"joints number:{len(scene.joints)}, fingers number:{len(scene.fingers)}\n", f"objects number: {len(scene.objects)}\n"
+            f"rotation:{scene.rotation}, timestep:{scene.timestep}\n"
+            f"timestamp:{scene.timestamp}, collision:{scene.collision}, info:{scene.info}")
+
+    '''
+    return robot pose
+    (X, Y,Yaw(deg))         
+    '''
+    def get_pose_XYDeg(self,scene_id=0):
+        scene =  self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
+        return scene.location.X,scene.location.Y,(scene.rotation.Yaw)
+    '''
+    return robot pose 
+    (X, Y,Yaw(deg))         
+    '''
+    def get_pose_XYRad(self,scene_id=0):
+        scene =  self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
+        return scene.location.X,scene.location.Y,(scene.rotation.Yaw)*3.1415926/180.0
+
 
     '''
     尝试返回坐标

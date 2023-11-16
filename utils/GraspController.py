@@ -3,9 +3,11 @@ import grpc
 import GrabSim_pb2_grpc
 import GrabSim_pb2
 
+
 from .SceneManager import SceneManager
 from .ObjectController import ObjectController
-from utils.JointController import JointController
+
+from .JointController import JointController
 
 
 class GraspController:

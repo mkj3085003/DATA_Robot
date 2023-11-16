@@ -3,7 +3,9 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import GrabSim_pb2
+
 from .SceneManager import SceneManager
+
 
 class CameraController:
     def __init__(self, scene_manager):
@@ -25,8 +27,26 @@ class CameraController:
     def show_image(self, img_data):
         im = img_data.images[0]
         d = np.frombuffer(im.data, dtype=im.dtype).reshape((im.height, im.width, im.channels))
-        plt.imshow(d, cmap="gray" if "depth" in im.name.lower() else None)
+      
+        if 'depth' in im.name.lower():
+            plt.imshow(d, cmap="gray",vmin=0,vmax=d.max())
+            plt.colorbar()  # 添加颜色条
+        else :
+            plt.imshow(d,cmap=None,vmin=0,vmax=255)
         plt.show()
+
+    def save_image(self, img_data):
+        im = img_data.images[0]
+        d = np.frombuffer(im.data, dtype=im.dtype).reshape((im.height, im.width, im.channels))
+        plt.axis('off')   # 去坐标轴
+        plt.xticks([])    # 去 x 轴刻度
+        plt.yticks([])    # 去 y 轴刻度
+        if 'depth' in im.name.lower():
+            plt.imshow(d, cmap="gray",vmin=0,vmax=600)
+            
+        else :
+            plt.imshow(d)
+        plt.savefig(im.name+".png",bbox_inches='tight', pad_inches=0)
 
 if __name__ == '__main__':
     scene_manager = SceneManager()
@@ -48,7 +68,7 @@ if __name__ == '__main__':
     # 选择要测试的相机(也可以是一个列表，同时返回多个)
     # camera_name = GrabSim_pb2.CameraName.Head_Color
     # camera_name = GrabSim_pb2.CameraName.Head_Depth
-    camera_name = GrabSim_pb2.CameraName.Head_Segment
+    camera_name = GrabSim_pb2.CameraName.Head_Depth
     # 获取相机图像
     img_data = camera_controller.capture_image(camera_name)
 
