@@ -3,13 +3,14 @@ import grpc
 import GrabSim_pb2_grpc
 import GrabSim_pb2
 
-from utils.SceneManager import SceneManager
+from .SceneManager import SceneManager
+
 class ObjectController:
     def __init__(self, scene_manager):
         self.scene_manager = scene_manager
 
     def generate_objects(self, object_list,scene_id=0):
-        print('------------------gen objs----------------------')
+        print('------------------生成物体----------------------')
         # 获取当前场景中所有物体包括机器人的信息
         scene = self.scene_manager.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
         # 调用本地python仿真器对象sim_client的AddObjects方法，向UE端传入物品列表object_list对象
@@ -19,7 +20,7 @@ class ObjectController:
         return scene
 
     def remove_objects(self, id_list, scene_id=0):
-        # 调用本地python仿真器对象sim_client的RemoveObjects方法，
+        print('------------------移除物体----------------------')
         # 向UE端传入RemoveList对象，包括要删除的物品列表id_list对象，场景id为scene_id
         scene = self.scene_manager.sim_client.RemoveObjects(GrabSim_pb2.RemoveList(IDs=id_list, scene=scene_id))
         print(f"Removed objects {id_list}. Current objects:")
