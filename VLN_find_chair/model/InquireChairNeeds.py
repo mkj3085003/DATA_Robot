@@ -19,15 +19,22 @@ class InquireChairNeeds:
                           'content': "Hello, I am the intelligent service robot of TJark Cafe. I am very happy to serve you. How many of you are dining together? "}
         self.second_ask = {'role': 'assistant',
                            'content': 'Do you have any seat preference? Such as position, height, material, or avoiding the crowd, etc.?'}
-        self.prompt_end = {'role': 'system', 'content': "Conversation is finished. Please return the JSON."}
+        self.prompt_end = {'role': 'user', 'content': "Conversation is finished. Please return the JSON."}
+        self.prompt_json = {'role': 'assistant', 'content': "{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }"}
 
     def get_completion(self, prompt, model="gpt-3.5-turbo"):
-        messages = [{"role": "user", "content": prompt}]
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=messages,
-            temperature=0  # 控制模型输出的随机程度
-        )
+        a = 1
+        mymessage = [
+            self.prompt_front, self.first_ask,  # 进行首次问候及问题提问
+            {'role': 'user', 'content': "4"},  # 模拟用户回答第一个问题
+            self.second_ask,  # 向用户提出第二个问题
+            {'role': 'user', 'content': "Prefer a table near the window."},  # 模拟用户回答第二个问题
+            self.prompt_end,  # 结束对话
+            self.prompt_json,
+            {"role": "user", "content": prompt},
+            self.prompt_end,
+        ]
+        response = self.get_completion_from_messages(mymessage, temperature=0.3)
         return response.choices[0].message["content"]
 
     def get_completion_from_messages(self, messages, model="gpt-3.5-turbo", temperature=0):

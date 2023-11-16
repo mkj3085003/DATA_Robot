@@ -66,6 +66,17 @@ class SceneManager:
         return scene
 
     '''
+    尝试返回坐标
+    '''
+    def Observe_new(self, scene_id=0):
+        print('------------------show_env_info----------------------')
+
+        scene1 = self.sim_client.Observe(GrabSim_pb2.SceneID(value=scene_id))
+
+        for scene_object in scene1.objects:
+            print(scene_object)
+
+    '''
     重置场景
     1、重置桌子的宽度和高度（传入adjust_table=true)
     2、清除生成的行人和物品
@@ -101,7 +112,9 @@ if __name__ == '__main__':
     for i in range(scene_num):
         print('------------ 场景操作 ------------')
         scene=scene_manager.Observe(i)
-        print(scene)
+        scene_manager.Observe_new(i)
+        #
+        # print(scene)
         # scene_manager.Reset(i)
 
 

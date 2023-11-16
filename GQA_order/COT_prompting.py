@@ -1,10 +1,13 @@
+import time
+
 import openai
 import json
 import sys 
 sys.path.append("../")
-from ChatBot import ChatBot#,API_KEY
+from utils.ChatBot import ChatBot#,API_KEY
 # api_key = "sk-z2ztez3nzdjRerVojn5LcTSsE5JzXxuDWk3oRHvigO0RzPHV"
-API_KEY = "sk-z2ztez3nzdjRerVojn5LcTSsE5JzXxuDWk3oRHvigO0RzPHV"
+API_KEY = "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"
+
 #22:00领取可用：
 #sk-Nqaedek5GkD6fC9SVyMwVTCEVeSIh5WB9EhQjAFWqjNdOZ0R
 #sk-qoXUG1ZD6BI2Lkfov8fOir8bI1dJkTd9hgEZhrHskejp15eM
@@ -23,6 +26,9 @@ class OrderAgent(ChatBot):
             MENU_FILE = json_file.read()
             MENU = json.loads(MENU_FILE)
         self.menu=MENU['food']
+        
+        # 存储对话的内容
+
         self.conversation = []
                             #角色+任务+注意事项/实现细节+
         self.start_prompt={'role': 'system', 'content':
@@ -108,13 +114,37 @@ class OrderAgent(ChatBot):
                 count += 1
                 print('order bot:', reply)
                 # 判断是否结束对话
-                
+
+    def chat_with_bubble(self,temp,robot_task_controller,pedestrian_controller,customer_name):
+        count=0
+        while True:
+            # 用户输入
+            if( self.if_end() and self.if_menu() and count>2) or count > 5:#限制对话强制小于5轮不然说个没完没了.
+                print("===============Order corversation is over===============")
+                # 结束对话
+                self.conversation.append(self.end_prompt)
+                return self.conversation
+            else:
+                input_from_user = str(input("user:"))
+                pedestrian_controller.talk_walkers(customer_name, input_from_user)
+                self.conversation.append({'role': 'user', 'content': input_from_user})
+                time.sleep(20)
+                # 模型回复
+                reply = self.get_message_completion(self.conversation, temperature=temp)
+                robot_task_controller.display_text_bubble(reply)
+                self.conversation.append({'role': 'assistant', 'content': reply})
+                count += 1
+                print('order bot:', reply)
+                time.sleep(20)
+                # 判断是否结束对话
+
     
 
     
 if __name__  == '__main__':
-    ORDER_LIST=[]
-    order_agent =  OrderAgent()
+    ORDER_LIST = []
+    order_agent = OrderAgent()
+
     print(f"order bot: It's my pleasure to serve you. What would you like to order? Here is our menu \n{order_agent.menu}")
     order_agent.chat(temp=0)
     print(order_agent.get_json())

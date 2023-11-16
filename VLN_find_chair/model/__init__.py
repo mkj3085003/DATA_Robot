@@ -1,1 +1,1 @@
-__all__ = ['robot_pose_prediction']
+__all__ = ['robot_pose_prediction','InquireChairNeeds', 'match_best_chair']

@@ -21,6 +21,8 @@ import GrabSim_pb2
 from utils.SceneManager import SceneManager
 
 
+
+
 if __name__ == '__main__':
     scene_manager = SceneManager()
 
