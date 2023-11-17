@@ -143,6 +143,7 @@ if __name__ == '__main__':
     scene_manager = SceneManager()
     camera=CameraController(scene_manager)
     map_id =11  # Map ID: 11 for the coffee shop
+
     scene_manager.Init()
     scene_manager.SetWorld(map_id)
     scene_manager.Reset(scene_id=0)
@@ -155,6 +156,7 @@ if __name__ == '__main__':
     # camera.show_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Segment,0))
 
     mapbuilder=MapBuilder(args)
+
 
     locs=mapbuilder.get_walkers_loc(scene_manager)
     # print(locs)
