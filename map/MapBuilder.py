@@ -73,7 +73,10 @@ class MapBuilder(object):
         pcd=get_pcd_by_id(point_cloud,251)#行人
 
         # o3d.visualization.draw_geometries([pcd])
-        cluster_centers = cluster_and_get_center(pcd, eps=30, min_points=8,vis=False)
+        try:
+            cluster_centers = cluster_and_get_center(pcd, eps=30, min_points=8,vis=False)
+        except:
+            return None
         return cluster_centers[:,[0,1]]
 
 

@@ -12,6 +12,7 @@ from VLN_find_chair.model.match_best_chair import *
 
 
 
+
 '''场景一：咖啡厅服务员位于吧台处等待，识别顾客靠近，为行人匹配座位'''
 
 
@@ -170,7 +171,7 @@ inquirer = InquireChairNeeds()  # 初始化对话类
 res = inquirer.get_completion(talk_walker_response)#开始匹配
 print(res)
 chair_list = ChairList()
-ordered_feature = chair_list.decode_feature("{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }")
+ordered_feature = chair_list.decode_feature(res)
 chair = chair_list.find_the_best(ordered_feature)
 print(chair)
 
