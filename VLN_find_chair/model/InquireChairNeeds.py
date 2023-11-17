@@ -14,7 +14,7 @@ class InquireChairNeeds:
             You are a cafe waiter robot that automatically collects seat order information for a Starbucks...
             [此处为提供的对话流程文本，具体内容请填充到这里]
             - Location   (options: 'dont mind', 'Near the window', 'near the bar', 'center of the cafe')
-            - Share      (options: 'dont mind sharing a table', 'alone')
+            - Share      (options: 'dont mind sharing a table', 'dont want to share')
             - Height     (options: 'high', 'low', 'dont mind')
             - Material   (options: 'soft', 'hard', 'dont mind')
             - number_of_people (int)
@@ -42,12 +42,9 @@ class InquireChairNeeds:
             self.prompt_end,  # 结束对话
             self.prompt_json_second,
             self.first_ask,  # 进行首次问候及问题提问
-            {'role': 'user', 'content': "1"},  # 模拟用户回答第一个问题
-            self.second_ask,  # 向用户提出第二个问题
-            {'role': 'user', 'content': "I'd like a seat by the firecamp."},  # 模拟用户回答第二个问题
+            {'role': 'user', 'content': "I'm here alone. I'd like a seat by the firecamp."},  # 模拟用户回答第一个问题
             self.prompt_end,  # 结束对话
             self.prompt_json_third,
-
             {"role": "user", "content": prompt},
             self.prompt_end,
         ]
@@ -81,7 +78,7 @@ class InquireChairNeeds:
 
 
 if __name__ == '__main__':
-    talk_walker_response = " I'm here alone.I'd like a seat by the firecamp."
+    talk_walker_response = " I'm here alone.I'd like a seat by the window."
     #执行输出
     inquirer = InquireChairNeeds()  # 初始化对话类
     # response = inquirer.initiate_conversation()  # 调用对话函数

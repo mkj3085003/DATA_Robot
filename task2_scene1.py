@@ -160,14 +160,14 @@ while True:
 
 # 向顾客问好
 robot_task_controller = RobotTaskController(scene_manager)
-robot_task_controller.display_text_bubble("您好，您需要什么帮助吗？")
+robot_task_controller.display_text_bubble("您好，您需要什么帮助吗？请问几位？对于位置有什么偏好吗？")
 time.sleep(2)
 talk_walker_response = " I'm here alone.I'd like a seat by the window."
 pedestrian_controller.talk_walkers(detected_customer.name, talk_walker_response)
 #执行输出
 inquirer = InquireChairNeeds()  # 初始化对话类
 # response = inquirer.initiate_conversation()  # 调用对话函数
-res = inquirer.get_completion_from_messages(talk_walker_response)#开始匹配
+res = inquirer.get_completion(talk_walker_response)#开始匹配
 print(res)
 chair_list = ChairList()
 ordered_feature = chair_list.decode_feature("{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }")
@@ -175,14 +175,17 @@ chair = chair_list.find_the_best(ordered_feature)
 print(chair)
 
 #带领
+robot_task_controller.display_text_bubble("好的，这就带您去")
+
 navi = NavigationController(scene_manager)
 print(navi.navigate_to_limit(chair["position"][0],chair["position"][1],end_yaw,200,100))
 # Sleep(1000)
 #更新椅子数目
+chair_list.update_chair_list(chair["id"],ordered_feature["Capacity"])
 time.sleep(5.0)
 #行人走向目标椅子
 pedestrian_controller.control_one_pedestrian(walker_id,chair["position"][0],chair["position"][1],end_yaw, walker_speed=200, scene_id=0)
-
+#机器人回来等待下一个顾客
 
 
 
