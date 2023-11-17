@@ -1,7 +1,6 @@
 import GrabSim_pb2
 import time
 
-
 from .SceneManager import SceneManager
 
 
@@ -19,11 +18,12 @@ class JointController:
     5、每个关节都有不同的限位,参考限位图合理设置关节角度
     '''
 
-    def rotate_joints(self, action_list,scene_id=0):
+    def rotate_joints(self, action_list, scene_id=0):
         print('------------------rotate_joints----------------------')
 
         for values in action_list:
-            action = GrabSim_pb2.Action(scene=scene_id, action=GrabSim_pb2.Action.ActionType.RotateJoints,values=values)
+            action = GrabSim_pb2.Action(scene=scene_id, action=GrabSim_pb2.Action.ActionType.RotateJoints,
+                                        values=values)
 
             scene = self.scene_manager.sim_client.Do(action)
 
@@ -40,10 +40,11 @@ class JointController:
     '''
     重置躯干和双臂关节
     '''
+
     def reset_joints(self, scene_id=0):
         print('------------------reset_joints----------------------')
         values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        action = GrabSim_pb2.Action(scene=scene_id, action=GrabSim_pb2.Action.ActionType.RotateJoints,values=values)
+        action = GrabSim_pb2.Action(scene=scene_id, action=GrabSim_pb2.Action.ActionType.RotateJoints, values=values)
 
         scene = self.scene_manager.sim_client.Do(action)
 
@@ -64,7 +65,8 @@ class JointController:
     4、在抓取物品时,可以根据需要微调关节角度,避免穿模或者手指变形的情况
     finger_value= [-6, 0, 45, 45, 45, -6, 0, 45, 45, 45]
     '''
-    def rotate_fingers(self,finger_value,scene_id=0):
+
+    def rotate_fingers(self, finger_value, scene_id=0):
         print('------------------rotate_fingers----------------------')
 
         action = GrabSim_pb2.Action(scene=scene_id, action=GrabSim_pb2.Action.ActionType.Finger, values=finger_value)
@@ -83,7 +85,7 @@ class JointController:
     重置手指关节
     '''
 
-    def reset_fingers(self,scene_id=0):
+    def reset_fingers(self, scene_id=0):
         print('------------------reset_fingers----------------------')
         values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         action = GrabSim_pb2.Action(scene=scene_id, action=GrabSim_pb2.Action.ActionType.Finger, values=values)
@@ -104,28 +106,39 @@ class JointController:
     handNum=2是右手
     输入末端位置,IK控制胳膊移动到可达位置
     '''
-    def ik_control_left_hand(self,x,y,z,roll = 0, pitch = 0, yaw = 0,scene_id=0):
+
+    def ik_control_left_hand(self, x, y, z, roll=0, pitch=0, yaw=0, scene_id=0):
         print('------------------ik_control_left_hand----------------------')
         # IK控制,左手
-        HandPostureObject = [GrabSim_pb2.HandPostureInfos.HandPostureObject(handNum = 1, x = x, y = y, z = z, roll = roll, pitch = pitch, yaw = yaw)]
-        self.scene_manager.sim_client.GetIKControlInfos(GrabSim_pb2.HandPostureInfos(scene=scene_id, handPostureObjects=HandPostureObject))
+        HandPostureObject = [
+            GrabSim_pb2.HandPostureInfos.HandPostureObject(handNum=1, x=x, y=y, z=z, roll=roll, pitch=pitch, yaw=yaw)]
+        self.scene_manager.sim_client.GetIKControlInfos(
+            GrabSim_pb2.HandPostureInfos(scene=scene_id, handPostureObjects=HandPostureObject))
 
-    def ik_control_right_hand(self,x,y,z,roll = 0, pitch = 0, yaw = 0,scene_id=0):
+    def ik_control_right_hand(self, x, y, z, roll=0, pitch=0, yaw=0, scene_id=0):
         print('------------------ik_control_right_hand----------------------')
-        # IK控制,左手
-        HandPostureObject = [GrabSim_pb2.HandPostureInfos.HandPostureObject(handNum = 1, x = x, y = y, z = z, roll = roll, pitch = pitch, yaw = yaw)]
-        self.scene_manager.sim_client.GetIKControlInfos(GrabSim_pb2.HandPostureInfos(scene=scene_id, handPostureObjects=HandPostureObject))
+        # IK控制,右手
+        HandPostureObject = [
+            GrabSim_pb2.HandPostureInfos.HandPostureObject(handNum=2, x=x, y=y, z=z, roll=roll, pitch=pitch, yaw=yaw)]
+        self.scene_manager.sim_client.GetIKControlInfos(
+            GrabSim_pb2.HandPostureInfos(scene=scene_id, handPostureObjects=HandPostureObject))
 
-    def ik_control_both_hands(self,hand_values,scene_id=0):
+    def ik_control_both_hands(self, hand_values, scene_id=0):
         print('------------------ik_control_both_hands----------------------')
         # IK控制,双手
         left_hand_values = hand_values[0]
         right_hand_values = hand_values[1]
         HandPostureObject = [
-            GrabSim_pb2.HandPostureInfos.HandPostureObject(handNum=1, x=left_hand_values[0], y=left_hand_values[1], z=left_hand_values[2], roll=left_hand_values[3], pitch=left_hand_values[4], yaw=left_hand_values[5]),
-            GrabSim_pb2.HandPostureInfos.HandPostureObject(handNum=2, x=right_hand_values[0], y=right_hand_values[1], z=right_hand_values[2], roll=right_hand_values[3], pitch=right_hand_values[4], yaw=right_hand_values[5])
+            GrabSim_pb2.HandPostureInfos.HandPostureObject(handNum=1, x=left_hand_values[0], y=left_hand_values[1],
+                                                           z=left_hand_values[2], roll=left_hand_values[3],
+                                                           pitch=left_hand_values[4], yaw=left_hand_values[5]),
+            GrabSim_pb2.HandPostureInfos.HandPostureObject(handNum=2, x=right_hand_values[0], y=right_hand_values[1],
+                                                           z=right_hand_values[2], roll=right_hand_values[3],
+                                                           pitch=right_hand_values[4], yaw=right_hand_values[5])
         ]
-        self.scene_manager.sim_client.GetIKControlInfos(GrabSim_pb2.HandPostureInfos(scene=scene_id, handPostureObjects=HandPostureObject))
+        self.scene_manager.sim_client.GetIKControlInfos(
+            GrabSim_pb2.HandPostureInfos(scene=scene_id, handPostureObjects=HandPostureObject))
+
 
 # if __name__ == '__main__':
 #     scene_manager = SceneManager()
@@ -160,5 +173,36 @@ class JointController:
 #                     3.33]]
 #
 #     joint_controller.rotate_joints(joint_values)  # 关节控制测试
+if __name__ == '__main__':
+    # Create an instance of the SceneManager class
+    scene_manager = SceneManager()
+
+    map_id = 11  # 地图编号
+
+    scene_num = 1  # 场景数量
+
+    print('------------ 初始化加载场景 ------------')
+    scene_manager.Init()
+    scene_manager.AcquireAvailableMaps()
+    scene_manager.SetWorld(map_id, scene_num)
+    time.sleep(5.0)
+
+    for i in range(scene_num):
+        print('------------ 场景操作 ------------')
+        scene = scene_manager.Observe(i)
+        scene_manager.Reset(i)
+        print(scene)
 
 
+    joint_controller = JointController(scene_manager)
+
+    joint_controller.ik_control_right_hand(x=-30, y=40, z=80, roll=0, pitch=0, yaw=0, scene_id=0)
+    time.sleep(10)
+
+    finger_value=[-6, 0, 45, 45, 45, -6, 0, 45, 45, 45]
+    joint_controller.rotate_fingers(finger_value)
+    # joint_controller.ik_control_left_hand(x=30, y=40, z=80, roll=0, pitch=0, yaw=0, scene_id=0)
+
+
+    # hand_values = [[30, 40, 80, 0, 0, 0], [-30, 40, 80, 0, 0, 0]]
+    # joint_controller.ik_control_both_hands(hand_values)
