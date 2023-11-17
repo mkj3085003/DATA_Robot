@@ -81,22 +81,24 @@ def navigate():
     
     result_scene = navigator.navigate_to_limit(247, -10,270,100,100)
     
-    result_scene = navigator.navigate_to_limit(400, -299,300,100,100)
+    result_scene = navigator.navigate_to_limit(320, -250,300,100,100)
 
-    result_scene = navigator.navigate_to_limit(170, -330,270,100,100)
+    result_scene = navigator.navigate_to_limit(170, -330,270,80,100)
+
+    result_scene = navigator.navigate_to_limit(170, -330,220,80,100)
 
     result_scene = navigator.navigate_to_limit(-50, 0,180,100,100)
 
-    result_scene = navigator.navigate_to_limit(-50, 500,180,100,100)
-
-    result_scene = navigator.navigate_to_limit(-180, 73,90,100,100)
-
-    result_scene = navigator.navigate_to_limit(-180, 480,90,100,100)
-
-    result_scene = navigator.navigate_to_limit(-180, 480,0,100,100)
-
     result_scene = navigator.navigate_to_limit(300, 1300,90,100,100)
 
+    # result_scene = navigator.navigate_to_limit(-50, 500,180,80,100)
+
+    result_scene = navigator.navigate_to_limit(-240, 73,90,100,100)
+
+    result_scene = navigator.navigate_to_limit(-240, 480,90,100,100)
+
+    
+    
     global navigate_end
     navigate_end = True
 
@@ -143,7 +145,6 @@ if __name__ == '__main__':
     scene_manager = SceneManager()
     camera=CameraController(scene_manager)
     map_id =11  # Map ID: 11 for the coffee shop
-
     scene_manager.Init()
     scene_manager.SetWorld(map_id)
     scene_manager.Reset(scene_id=0)
@@ -157,8 +158,7 @@ if __name__ == '__main__':
 
     mapbuilder=MapBuilder(args)
 
-
-    locs=mapbuilder.get_walkers_loc(scene_manager)
+    # locs=mapbuilder.get_walkers_loc(scene_manager)
     # print(locs)
     # sys.exit()
 
