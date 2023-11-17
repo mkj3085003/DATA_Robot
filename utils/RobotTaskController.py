@@ -1,9 +1,9 @@
 import time
 import GrabSim_pb2
 
-from .SceneManager import SceneManager
+from DATA_Robot.utils.SceneManager import SceneManager
 
-from utils.NavigationController import NavigationController
+
 
 # # For prerequisites running the following sample, visit https://help.aliyun.com/document_detail/611472.html
 # from http import HTTPStatus

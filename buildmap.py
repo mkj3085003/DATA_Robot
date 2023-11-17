@@ -1,13 +1,11 @@
 import time
-import matplotlib.pyplot as plt
 import numpy as np
 import GrabSim_pb2
-from utils.SceneManager import SceneManager
-from utils.CameraController import CameraController
-from utils.NavigationController import NavigationController
-from map.MapBuilder import MapBuilder,show_pointcloud
+from DATA_Robot.utils.SceneManager import SceneManager
+from DATA_Robot.utils.CameraController import CameraController
+from DATA_Robot.utils.NavigationController import NavigationController
+from map.MapBuilder import MapBuilder
 import map.depth_utils as du
-import threading
 import argparse
 import sys
 

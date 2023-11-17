@@ -7,7 +7,7 @@ import grpc
 import sys
 
 
-from utils.SceneManager import SceneManager
+from DATA_Robot.utils.SceneManager import SceneManager
 import GrabSim_pb2_grpc
 import GrabSim_pb2
 

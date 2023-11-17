@@ -1,12 +1,10 @@
-import math
 import time
-import random
 
 from GQA_order.COT_prompting import OrderAgent
-from utils.NavigationController import NavigationController
-from utils.RobotTaskController import RobotTaskController
-from utils.SceneManager import SceneManager
-from utils.PedestrianController import PedestrianController
+from DATA_Robot.utils.NavigationController import NavigationController
+from DATA_Robot.utils.RobotTaskController import RobotTaskController
+from DATA_Robot.utils.SceneManager import SceneManager
+from DATA_Robot.utils.PedestrianController import PedestrianController
 
 '''场景：顾客落座后，机器人询问顾客点餐需求，与顾客完成点餐基本对话'''
 
@@ -46,7 +44,7 @@ result_scene = navigator.navigate_to_limit(75.7, 1084, 200, 200, 100)
 '''
 robot_task_controller = RobotTaskController(scene_manager)
 ORDER_LIST = []
-order_agent = OrderAgent(menu_path="./GQA_order/data_object.json")
+order_agent = OrderAgent(menu_path="GQA_order/data_object.json")
 
 # 问好
 robot_task_controller.display_text_bubble("It's my pleasure to serve you. What would you like to order? Here is our menu.")

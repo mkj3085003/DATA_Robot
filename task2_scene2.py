@@ -1,16 +1,3 @@
-import time
-import random
-
-from utils.RobotTaskController import RobotTaskController
-from utils.SceneManager import SceneManager
-from utils.PedestrianController import PedestrianController
-from utils.NavigationController import NavigationController
-
-from VLN_find_chair.model.InquireChairNeeds import *
-from VLN_find_chair.model.match_best_chair import *
-
-
-
 '''场景一：咖啡厅服务员位于吧台处等待，识别顾客靠近，为行人匹配座位'''
 
 
@@ -43,13 +30,12 @@ def detect_customer_proximity(walkers):
 import time
 import random
 
-from utils.RobotTaskController import RobotTaskController
-from utils.SceneManager import SceneManager
-from utils.PedestrianController import PedestrianController
-from utils.NavigationController import NavigationController
+from DATA_Robot.utils.RobotTaskController import RobotTaskController
+from DATA_Robot.utils.SceneManager import SceneManager
+from DATA_Robot.utils.PedestrianController import PedestrianController
+from DATA_Robot.utils.NavigationController import NavigationController
 
-from VLN_find_chair.model.InquireChairNeeds import *
-from VLN_find_chair.model.match_best_chair import *
+from DATA_Robot.VLN_find_chair.model.match_best_chair import *
 
 
 

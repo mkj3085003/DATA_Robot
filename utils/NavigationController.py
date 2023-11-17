@@ -2,7 +2,7 @@ import GrabSim_pb2
 import time
 
 
-from .SceneManager import SceneManager
+from DATA_Robot.utils.SceneManager import SceneManager
 
 
 

@@ -1,24 +1,20 @@
 import time
-import os
 import torch
-import torch.nn as nn
 import clip
-import matplotlib.pyplot as plt
 import numpy as np
-from torchvision import transforms
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 ClipModel, transform = clip.load("ViT-B/32", device)
-from VLN_find_chair.model.robot_pose_prediction import RobotPosePrediction,preprocess
+from DATA_Robot.VLN_find_chair.model.robot_pose_prediction import RobotPosePrediction,preprocess
 model=RobotPosePrediction(ClipModel,3)
 
 import sys
-sys.path.append("../")
+sys.path.append("../the new/")
 # import utils
-from utils import *
-import GrabSim_pb2_grpc
+from DATA_Robot.utils import *
 import GrabSim_pb2
 # Create an instance of the SceneManager class
-from utils.SceneManager import SceneManager
+from DATA_Robot.utils.SceneManager import SceneManager
 
 
 

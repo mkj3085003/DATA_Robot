@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import GrabSim_pb2
 
-from .SceneManager import SceneManager
+from DATA_Robot.utils.SceneManager import SceneManager
 
 
 class CameraController:

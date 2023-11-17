@@ -21,7 +21,7 @@ import itertools
 import numpy as np
 import torch
 
-import map.rotation_utils as ru
+import DATA_Robot.map.rotation_utils as ru
 
 
 def get_camera_matrix(width, height, fov):

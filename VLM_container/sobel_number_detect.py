@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 import imutils
@@ -18,7 +20,11 @@ class ReadNumber:
         self.binary_image=()
 
     def get_template(self):
-        img = cv2.imread("C:\\Users\\12245\\Documents\\Unreal Projects\\HarixSim2\\python\\DATA_Robot\\VLM_container\\number.png")
+        current_directory = os.path.dirname(__file__)
+        filepath = os.path.abspath(os.path.join(current_directory, "../img/number.png"))
+        # 读取图像
+        img = cv2.imread(filepath)
+        print(img)
         ref = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # 二值图像
         ref = cv2.threshold(ref, 10, 255, cv2.THRESH_BINARY_INV)[1]
@@ -38,14 +44,14 @@ class ReadNumber:
         # img=cv2.imread("C:\\Users\\12245\\Documents\\Unreal Projects\\HarixSim2\\python\\DATA_Robot\\VLM_container\\gray_instance.png")
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         # cv_show('gray',gray)
-        cv2.imwrite("C:\\Users\\12245\\Documents\\Unreal Projects\\HarixSim2\\python\\DATA_Robot\\VLM_container\\gray_instance.png",gray)
+        cv2.imwrite("gray_instance.png",gray)
 
         x1, y1 = 370, 201
         x2, y2 = 421, 236
         # 通过切片操作进行图像裁剪,抠出空调板
         cropped_image = gray[y1:y2, x1:x2]
         self.binary_image = cv2.threshold(cropped_image, 125, 150, cv2.THRESH_BINARY_INV)[1]
-        cv2.imwrite("C:\\Users\\12245\\Documents\\Unreal Projects\\HarixSim2\\python\\DATA_Robot\\VLM_container\\bina.png",self.binary_image)
+        cv2.imwrite("bina.png",self.binary_image)
         return self.binary_image
 
     def detect_digits(self):

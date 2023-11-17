@@ -1,14 +1,12 @@
-import math
 import time
 import random
 
-from utils.RobotTaskController import RobotTaskController
-from utils.SceneManager import SceneManager
-from utils.PedestrianController import PedestrianController
-from utils.NavigationController import NavigationController
+from DATA_Robot.utils.RobotTaskController import RobotTaskController
+from DATA_Robot.utils.SceneManager import SceneManager
+from DATA_Robot.utils.PedestrianController import PedestrianController
+from DATA_Robot.utils.NavigationController import NavigationController
 
-from VLN_find_chair.model.InquireChairNeeds import *
-from VLN_find_chair.model.match_best_chair import *
+from DATA_Robot.VLN_find_chair.model.match_best_chair import *
 
 
 
@@ -170,7 +168,7 @@ inquirer = InquireChairNeeds()  # 初始化对话类
 res = inquirer.get_completion(talk_walker_response)#开始匹配
 print(res)
 chair_list = ChairList()
-ordered_feature = chair_list.decode_feature("{\n  \"seat_preference\": \"near window\",\n  \"number_of_people\": 4\n }")
+ordered_feature = chair_list.decode_feature(res)
 chair = chair_list.find_the_best(ordered_feature)
 print(chair)
 

@@ -4,10 +4,10 @@ import GrabSim_pb2_grpc
 import GrabSim_pb2
 
 
-from .SceneManager import SceneManager
-from .ObjectController import ObjectController
+from DATA_Robot.utils.SceneManager import SceneManager
+from DATA_Robot.utils.ObjectController import ObjectController
 
-from .JointController import JointController
+from DATA_Robot.utils.JointController import JointController
 
 
 class GraspController:

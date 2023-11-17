@@ -5,8 +5,8 @@ import sys
 import time
 import grpc
 
-sys.path.append('./')
-sys.path.append('../')
+sys.path.append('/')
+sys.path.append('../the new/')
 
 import matplotlib.pyplot as plt
 import numpy as np

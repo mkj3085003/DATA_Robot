@@ -2,11 +2,10 @@ import time
 
 import openai
 import json
-import sys 
-sys.path.append("../")
-from utils.ChatBot import ChatBot#,API_KEY
-# api_key = "sk-z2ztez3nzdjRerVojn5LcTSsE5JzXxuDWk3oRHvigO0RzPHV"
-API_KEY = "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"
+
+from DATA_Robot.utils.ChatBot import ChatBot
+
+API_KEY = "sk-z2ztez3nzdjRerVojn5LcTSsE5JzXxuDWk3oRHvigO0RzPHV"
 
 #22:00领取可用：
 #sk-Nqaedek5GkD6fC9SVyMwVTCEVeSIh5WB9EhQjAFWqjNdOZ0R

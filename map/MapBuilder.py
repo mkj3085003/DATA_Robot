@@ -1,9 +1,9 @@
 import numpy as np
-import map.depth_utils as du
-import map.rotation_utils as ru
+import DATA_Robot.map.depth_utils as du
+import DATA_Robot.map.rotation_utils as ru
 import open3d as o3d
 import matplotlib.pyplot as plt
-from map.pcd_process import *
+from DATA_Robot.map.pcd_process import *
 import GrabSim_pb2
 
 class MapBuilder(object):
