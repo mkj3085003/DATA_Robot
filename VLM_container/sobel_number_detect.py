@@ -34,16 +34,18 @@ class ReadNumber:
             self.digits[i] = roi
         return  self.digits
 
-    def preprocess_image(self,img):
+    def preprocess_image(self,img):#
+        # img=cv2.imread("C:\\Users\\12245\\Documents\\Unreal Projects\\HarixSim2\\python\\DATA_Robot\\VLM_container\\gray_instance.png")
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         # cv_show('gray',gray)
         cv2.imwrite("C:\\Users\\12245\\Documents\\Unreal Projects\\HarixSim2\\python\\DATA_Robot\\VLM_container\\gray_instance.png",gray)
 
-        x1, y1 = 751, 200
-        x2, y2 = 804, 237
+        x1, y1 = 370, 201
+        x2, y2 = 421, 236
         # 通过切片操作进行图像裁剪,抠出空调板
         cropped_image = gray[y1:y2, x1:x2]
         self.binary_image = cv2.threshold(cropped_image, 125, 150, cv2.THRESH_BINARY_INV)[1]
+        cv2.imwrite("C:\\Users\\12245\\Documents\\Unreal Projects\\HarixSim2\\python\\DATA_Robot\\VLM_container\\bina.png",self.binary_image)
         return self.binary_image
 
     def detect_digits(self):
@@ -97,8 +99,13 @@ class ReadNumber:
             # print("output-numper:",output)
             number_str = ''.join(output)  # 将列表中的字符串元素连接起来
             self.number = int(number_str)  # 将结果字符串转换为整数
-            print("---I see air condition 's temprature: ",self.number,"℃---")
+            # if self.number == None:
+            #     """20-30间只有27识别不出……"""
+            #     self.number = 27
+            # print("----I see air condition 's temprature: ",self.number,"℃ ----")
             return self.number
 
-
-
+if __name__ == "__main__":
+    num_reader=ReadNumber()
+    num_reader.preprocess_image()
+    num_reader.detect_digits()
