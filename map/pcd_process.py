@@ -48,6 +48,42 @@ def get_point_cloud_of_view(color_raw,depth_raw,camera,downscal=5):
     
     return np.asarray(pcd.colors),np.asarray(pcd.points)
 
+def get_point_cloud_of_view(color_raw,depth_raw,camera,downscal=5):
+    color = o3d.geometry.Image((color_raw).astype(np.uint8))
+    depth=o3d.geometry.Image((depth_raw).astype(np.float32))
+    rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(color, depth,depth_scale=1.0,depth_trunc=600, convert_rgb_to_intensity=False)
+    intrinsic = o3d.camera.PinholeCameraIntrinsic(camera.w, camera.h, camera.fx,camera.fy, camera.cx, camera.cy)
+    intrinsic.intrinsic_matrix = [[camera.fx, 0, camera.cx], [0, camera.fy, camera.cy], [0, 0, 1]]
+    cam = o3d.camera.PinholeCameraParameters()
+    cam.intrinsic = intrinsic
+    
+    pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, cam.intrinsic)
+    pcd=pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+ 
+    # 使用remove_radius_outlier进行滤波
+    cl,idx = pcd.remove_radius_outlier(nb_points=5, radius=5)
+    pcd=pcd.select_by_index(idx)
+    
+    return np.asarray(pcd.colors),np.asarray(pcd.points)
+
+def get_point_cloud_of_view_and_remove(color_raw,depth_raw,camera,downscal=5):
+    color = o3d.geometry.Image((color_raw).astype(np.uint8))
+    depth=o3d.geometry.Image((depth_raw).astype(np.float32))
+    rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(color, depth,depth_scale=1.0,depth_trunc=600, convert_rgb_to_intensity=False)
+    intrinsic = o3d.camera.PinholeCameraIntrinsic(camera.w, camera.h, camera.fx,camera.fy, camera.cx, camera.cy)
+    intrinsic.intrinsic_matrix = [[camera.fx, 0, camera.cx], [0, camera.fy, camera.cy], [0, 0, 1]]
+    cam = o3d.camera.PinholeCameraParameters()
+    cam.intrinsic = intrinsic
+    
+    pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, cam.intrinsic)
+    pcd=pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+ 
+    # 使用remove_radius_outlier进行滤波
+
+    cl,idx = pcd.remove_radius_outlier(nb_points=5, radius=5)
+    pcd=pcd.select_by_index(idx)
+    pcd=remove_pcd_by_id(pcd)
+    return np.asarray(pcd.colors),np.asarray(pcd.points)
 
 
 
@@ -95,12 +131,24 @@ def get_pcd_by_id(pcd,target_id=251):
     idxs=np.where(color[:, 0]== target_id/255)[0]
     return pcd.select_by_index(idxs)
 
+def remove_pcd_by_id(pcd,remove_list=[251,254,253]):# floor roof wall ginger
+    idxs=[]
+    # remove_r=[x / 255 for x in remove_list]
+    color=np.asarray(pcd.colors)
+    for id_ in remove_list:
+        idxs.extend(np.where(color[:, 0] == id_/255)[0])
+    return pcd.select_by_index(idxs, invert=True)
+
+
 
 def cluster_and_get_center(pcd, eps, min_points,vis=False):
     # 使用DBSCAN进行点云密度聚类
     labels = np.array(pcd.cluster_dbscan(eps=eps, min_points=min_points, print_progress=False))
 
     # 获取聚类的数量
+    if(len(labels)==0):
+        return np.array([])
+        
     num_clusters = labels.max() + 1
     
     if vis:

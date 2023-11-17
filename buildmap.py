@@ -10,6 +10,7 @@ import map.depth_utils as du
 import threading
 import argparse
 import sys
+import open3d as o3d
 
 navigate_end =False
 
@@ -17,7 +18,7 @@ test_point_cloud=False
 
 def get_args():
     parser = argparse.ArgumentParser(
-        description='MO-VLN')
+        description='buildmap')
 
 
 
@@ -30,11 +31,8 @@ def get_args():
                         help="agent camera height in cm")
     parser.add_argument('--fov', type=float, default=80.5,
                         help="horizontal field of view in degrees")
-    parser.add_argument('--turn_angle', type=float, default=15,
-                        help="Agent turn angle in degrees")
 
-    parser.add_argument('--q', type=float, default=0.3,
-                        help="Minimum depth for depth sensor in meters")
+
     parser.add_argument('--max_depth', type=float, default=6.0,
                         help="Maximum depth for depth sensor in meters")
 
@@ -50,8 +48,8 @@ def get_args():
 
     parser.add_argument('--obs_threshold',type=float, default=1.0)
     parser.add_argument('--agent_min_z',type=int, default=-110)
-    parser.add_argument('--agent_max_z',type=int, default=70)
-    parser.add_argument('--agent_height', type=float, default=0.72,
+    parser.add_argument('--agent_max_z',type=int, default=270)
+    parser.add_argument('--agent_height', type=float, default=72,
                         help="agent camera height in metres")
     # parse arguments
     args = parser.parse_args()
@@ -79,20 +77,27 @@ def get_obs(stub):
 def navigate():
     time.sleep(5)
     navigator = NavigationController(scene_manager)
-    target_x = 247  # Target x-coordinate
-    target_y = -10  # Target y-coordinate    
-    yaw = 270
+
     
-    result_scene = navigator.navigate_to_limit(target_x, target_y,yaw,100,100)
-    target_x = -50  # Target x-coordinate
-    target_y = 0  # Target y-coordinate     
-    yaw = 180
-    result_scene = navigator.navigate_to_limit(target_x, target_y,yaw,100,100)
+    result_scene = navigator.navigate_to_limit(247, -10,270,100,100)
     
-    target_x = -50  # Target x-coordinate
-    target_y = 500  # Target y-coordinate   
-    yaw = 180
-    result_scene = navigator.navigate_to_limit(target_x, target_y,yaw,100,100)
+    result_scene = navigator.navigate_to_limit(400, -299,300,100,100)
+
+    result_scene = navigator.navigate_to_limit(170, -330,270,100,100)
+
+    result_scene = navigator.navigate_to_limit(-50, 0,180,100,100)
+
+    result_scene = navigator.navigate_to_limit(-50, 500,180,100,100)
+
+    result_scene = navigator.navigate_to_limit(-180, 73,90,100,100)
+
+    result_scene = navigator.navigate_to_limit(-180, 480,90,100,100)
+
+    result_scene = navigator.navigate_to_limit(-180, 480,0,100,100)
+
+    result_scene = navigator.navigate_to_limit(300, 1300,90,100,100)
+
+    global navigate_end
     navigate_end = True
 
 def vis_map(plt,map2d,pose):
@@ -130,17 +135,17 @@ def add_walkers(sim_client,scene_id = 0):
 
 if __name__ == '__main__':
     args=get_args()
-    camera_matrix = du.get_camera_matrix(
-        args['frame_width'],
-        args['frame_height'],
-        args['fov'])
+    # camera_matrix = du.get_camera_matrix(
+    #     args['frame_width'],
+    #     args['frame_height'],
+    #     args['fov'])
 
     scene_manager = SceneManager()
     camera=CameraController(scene_manager)
     map_id =11  # Map ID: 11 for the coffee shop
-    scene_manager.load_scene(map_id)
-    num_scenes=1
-    scene_manager.reset_scene(scene_id=0)
+    scene_manager.Init()
+    scene_manager.SetWorld(map_id)
+    scene_manager.Reset(scene_id=0)
     time.sleep(6)
 
     
@@ -150,26 +155,23 @@ if __name__ == '__main__':
     # camera.show_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Segment,0))
 
     mapbuilder=MapBuilder(args)
-    mapbuilder.get_walkers_loc(scene_manager)
 
+    locs=mapbuilder.get_walkers_loc(scene_manager)
+    # print(locs)
+    # sys.exit()
 
-
-    
-    sys.exit()
     # 导航线程
     thread1 = threading.Thread(target=navigate)
-    #thread1.start()
+    thread1.start()
     # 建图
     
 
     plt.ion() # enable real-time plotting
     plt.figure(1) # create a plot
     
-
-    
     
 
-    while True:#not navigate_end :
+    while not navigate_end :
         rgb,depth,seg =  get_obs(scene_manager.sim_client)
         poses=np.array(scene_manager.get_pose_XYRad())
         depth = np.where(depth >= 599.0, 0.0, depth)
@@ -178,6 +180,6 @@ if __name__ == '__main__':
         vis_map(plt,mp,(x,y,poses[2]))
     
 
-    
+    o3d.visualization.draw_geometries([mapbuilder.seg_pcd_map])
     thread1.join()
 

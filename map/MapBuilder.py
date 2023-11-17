@@ -34,9 +34,11 @@ class MapBuilder(object):
         #2400//5=480
         self.map = np.zeros((self.map_size_cm // self.resolution,
                              self.map_size_cm // self.resolution), dtype=np.float32)
+        self.seg_pcd_map = o3d.geometry.PointCloud()
 
         self.agent_height = params['agent_height']
         self.agent_view_angle = params['agent_view_angle']
+        self.count=0
         return
     
     '''
@@ -44,7 +46,7 @@ class MapBuilder(object):
     usage : get walkers' loc in current view
     return : list of walkers' centers in world space (x,y)
     '''
-    def get_walkers_loc(self,scene_manager):
+    def get_walkers_loc(self,scene_manager,visualize=False):
         stub=scene_manager.sim_client
         current_pose=np.array(scene_manager.get_pose_XYRad())
         images=[] 
@@ -73,8 +75,10 @@ class MapBuilder(object):
         pcd=get_pcd_by_id(point_cloud,251)#行人
 
         # o3d.visualization.draw_geometries([pcd])
-        cluster_centers = cluster_and_get_center(pcd, eps=30, min_points=8,vis=False)
-        return cluster_centers[:,[0,1]]
+        cluster_centers = cluster_and_get_center(pcd, eps=30, min_points=8,vis=visualize)
+        if len(cluster_centers==0):
+            return np.array([])
+        return cluster_centers[:,[0,2]]
 
 
 
@@ -110,15 +114,15 @@ class MapBuilder(object):
         return grid_map
 
 
-
     def update_map(self,seg, depth, current_pose):
        
 
         #  将seg数组映射到颜色
         new_seg=seg_to_rgb(seg)
        # point_cloud = get_point_cloud_of_view(np.ones(shape=(depth.shape[0],depth.shape[1],3)),depth,self.camera_matrix,5)
-        point_seg ,point_cloud = get_point_cloud_of_view(new_seg,depth,self.camera_matrix,5)
-     
+        # 获取语义点云，去除天花板、地板、行人
+        point_seg ,point_cloud = get_point_cloud_of_view_and_remove(new_seg,depth,self.camera_matrix,5)
+
         agent_view = du.transform_camera_view(point_cloud,
                                               self.agent_height,
                                               self.agent_view_angle)
@@ -127,6 +131,18 @@ class MapBuilder(object):
         geocentric_pc = du.transform_pose(agent_view, current_pose)
         
         # viz_segment_3d(point_seg,geocentric_pc)
+        cur_point_cloud = o3d.geometry.PointCloud()
+        cur_point_cloud.points = o3d.utility.Vector3dVector(geocentric_pc)
+        cur_point_cloud.colors = o3d.utility.Vector3dVector(point_seg)
+        self.seg_pcd_map+=cur_point_cloud
+        self.seg_pcd_map = self.seg_pcd_map.voxel_down_sample(voxel_size=self.resolution)
+        
+
+        # if self.count%5==0:
+        #     o3d.visualization.draw_geometries([self.seg_pcd_map])
+        # self.count+=1
+
+        
 
 
         cur_grid_map=self.to_2d_grid_map(geocentric_pc,self.agent_min_z,self.agent_max_z)
