@@ -15,6 +15,7 @@ class Conditioner():
         # 开关\加\减、111
         # 原来的
         self.key = [(300.00, -142.4999, 109.0), (300.00, -139.999, 109.0), (300.00, -137.0, 109.0)]
+        # self.key = [(300.50, -137.499, 111.0), (300.50, -139.999, 111.0), (300.50, -142.4999, 111.0)]
         self.delta_collision = 0.3
         self.scene_manager=scene_manager
         self.joint = JointController(self.scene_manager)
