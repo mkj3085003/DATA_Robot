@@ -5,6 +5,7 @@ from utils.RobotTaskController import RobotTaskController
 from utils.SceneManager import SceneManager
 from utils.PedestrianController import PedestrianController
 from utils.NavigationController import NavigationController
+from utils.CalculateYaw import calculate_angle
 
 from VLN_find_chair.model.InquireChairNeeds import *
 from VLN_find_chair.model.match_best_chair import *
@@ -75,9 +76,11 @@ def detect_customer_proximity(walkers):
 
 def find_id_by_name(walker_list, name):
     for walker in walker_list:
-        if walker.name == name:
-            return walker.id
+        if walker['walker'].name == name:
+            return walker.walker_id
     return None  # 如果没有找到，返回Non
+
+
 
 
 '''
@@ -136,6 +139,7 @@ pedestrian_data = [[0, 0, 880, 0], [1, 250, 1200,0], [2, -55, 750,90], [3, 70, -
 pedestrian_controller = PedestrianController(scene_manager)
 result_scene = pedestrian_controller.add_multiple_pedestrians(pedestrian_data, scene_id=0)
 
+time.sleep(5)
 walkers = pedestrian_controller.get_walkers()
 print(walkers)
 
@@ -175,9 +179,10 @@ points=[[250,1200],[520,1400],[100,1000],[-100,350],[0,0],[-210,250]]
 i=0
 while True:
     time.sleep(1)
-    walkers_points = mapbuilder.get_walkers_loc(scene_manager)
+    walkers_points = mapbuilder.get_walkers_loc(scene_manager, True)
     time.sleep(3)
 
+    print(walkers_points)
     #走过去
     navi = NavigationController(scene_manager)
     try:
@@ -204,11 +209,15 @@ while True:
         navi.navigate_to_limit(points[i%len(points)][0],points[i%len(points)][1], random.randint(0, 360),100,100)
         i+=1
 
+#转向
+yaw = calculate_angle(walkers_points[0][0],walkers_points[0][1],detected_customer.pose.X, detected_customer.pose.Y)
+navi.navigate_to_limit(walkers_points[0][0],walkers_points[0][1],yaw,100,100)
+
 # 向顾客问好
 robot_task_controller = RobotTaskController(scene_manager)
 robot_task_controller.display_text_bubble("您好，您需要什么帮助吗？请问几位？对于位置有什么偏好吗？")
 time.sleep(2)
-talk_walker_response = " I'm here alone.I'd like a seat by the window."
+talk_walker_response = " I'm here alone.I'd like a seat by the bar."
 pedestrian_controller.talk_walkers(detected_customer.name, talk_walker_response)
 #执行输出
 inquirer = InquireChairNeeds()  # 初始化对话类
@@ -217,6 +226,7 @@ res = inquirer.get_completion(talk_walker_response)#开始匹配
 print(res)
 chair_list = ChairList()
 ordered_feature = chair_list.decode_feature(res)
+print(ordered_feature)
 chair = chair_list.find_the_best(ordered_feature)
 print(chair)
 
@@ -224,11 +234,14 @@ print(chair)
 robot_task_controller.display_text_bubble("好的，这就带您去")
 
 navi = NavigationController(scene_manager)
-print(navi.navigate_to_limit(chair["position"][0],chair["position"][1],0,200,100))
+(navi.navigate_to_limit(chair["position"][0],chair["position"][1],0,200,100))
 # Sleep(1000)
 #更新椅子数目
 chair_list.update_chair_list(chair["id"],ordered_feature["Capacity"])
 time.sleep(5.0)
 #行人走向目标椅子
-pedestrian_controller.control_one_pedestrian(find_id_by_name(walker_list, detected_customer.name),chair["position"][0],chair["position"][1],end_yaw, walker_speed=200, scene_id=0)
+yaw = calculate_angle(walkers_points[0][0],walkers_points[0][1],chair["position"][0],chair["position"][1])
+
+id_walk = find_id_by_name(walker_list, detected_customer.name)
+pedestrian_controller.control_one_pedestrian(id_walk,chair["position"][0],chair["position"][1],yaw, walker_speed=200, scene_id=0)
 #机器人回来等待下一个顾客

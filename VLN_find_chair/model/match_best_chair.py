@@ -146,10 +146,10 @@ class ChairList:
         return self.total_empty_chair
     
     def match_best_chair(self,empty_chairs, demand_feature):
-        min_distance = 7
+        min_distance = 10
         for chair in empty_chairs:
             if chair['Capacity']>= demand_feature['Capacity']: #检查大小
-                dis=hamming(list(chair['feature']),list(demand_feature["Feature"])) * len(chair['feature'])
+                dis=hamming(list(chair['feature']),list(demand_feature["Feature"]))*len(chair['feature'])
                 # 如果不介意，dontmind编码距离减去1
                 if demand_feature["Location"]=="00":
                     dis-1
@@ -165,9 +165,9 @@ class ChairList:
                     best_chair = chair
         return best_chair
     
-    # def hamming_distance(self, str1, str2):
-    #     assert len(str1) == len(str2), "Input strings must have the same length."
-    #     return sum(bit1 != bit2 for bit1, bit2 in zip(str1, str2))
+    def hamming_distance(self, str1, str2):
+        assert len(str1) == len(str2), "Input strings must have the same length."
+        return sum(bit1 != bit2 for bit1, bit2 in zip(str1, str2))
     
     def find_the_best(self,demand_feature_ordered):
         min_distance=7 #7位全不一样
