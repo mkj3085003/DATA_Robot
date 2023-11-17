@@ -1,8 +1,8 @@
 import numpy as np
 import math
 import json
-from InquireChairNeeds import InquireChairNeeds
-
+from .InquireChairNeeds import InquireChairNeeds
+from scipy.spatial.distance import hamming
 # 打开JSON文件并加载数据
 
 CHAIR_NUM=30
@@ -42,6 +42,7 @@ class ChairList:
         self.empty_chair=list(self.CHAIR_LIST)#有空位
 
     def decode_feature(self, json_str):
+        #更改，因为alone会造成一个人时都是alone
         '''FEATURE_DESCRIPTION={
             #总共7位二进制编码
             #location
@@ -50,7 +51,7 @@ class ChairList:
             "near the bar":"10",
             #share
             "dont mind sharing a table":"0", 
-            "alone":"1",
+            "dont want to share":"1",
             #height
             "dont mind":"00",
             "high":"01", #高度这里空了一个11码……导致了有2^5个空值……但便于比较
@@ -76,7 +77,7 @@ class ChairList:
             str += "00"
 
         try:
-            if parsed_json['Share'] == "alone":
+            if parsed_json['Share'] == "dont want to share":
                 str += "1"
             else:
                 str += "0"
@@ -144,8 +145,8 @@ class ChairList:
     def match_best_chair(self,empty_chairs, demand_feature):
         min_distance = 7
         for chair in empty_chairs:
-            if chair['Capacity']>= demand_feature['Capacity']:
-                dis=self.hamming_distance(chair['feature'],demand_feature["Feature"])
+            if chair['Capacity']>= demand_feature['Capacity']: #检查大小
+                dis=hamming(list(chair['feature']),list(demand_feature["Feature"])) * len(chair['feature'])
                 # 如果不介意，dontmind编码距离减去1
                 if demand_feature["Location"]=="00":
                     dis-1
@@ -161,9 +162,9 @@ class ChairList:
                     best_chair = chair
         return best_chair
     
-    def hamming_distance(self, str1, str2):
-        assert len(str1) == len(str2), "Input strings must have the same length."
-        return sum(bit1 != bit2 for bit1, bit2 in zip(str1, str2))   
+    # def hamming_distance(self, str1, str2):
+    #     assert len(str1) == len(str2), "Input strings must have the same length."
+    #     return sum(bit1 != bit2 for bit1, bit2 in zip(str1, str2))
     
     def find_the_best(self,demand_feature_ordered):
         min_distance=7 #7位全不一样
@@ -190,8 +191,12 @@ class ChairList:
     #             # 更新剩余空椅子列表
     #             self.total_empty_chair = [chair for chair in CHAIR_LIST if not chair['sitted']]
         # originalChairData = next((item for item in ChairList if item['id'] == seat_id), None)
-        emptyChairData = next((item for item in self.CHAIR_LIST if item['id'] == seat_id), None)
+        emptyChairData = next((item for item in self.empty_chair if item['id'] == seat_id), None)
         emptyChairData['Capacity'] = emptyChairData['Capacity'] - capacity
+        if capacity > emptyChairData['Capacity']:
+            raise ValueError("wrong capacity!")
+        if emptyChairData['Capacity'] == 0:
+            self.empty_chair.remove(emptyChairData)
         totalEmptyChairData = next((item for item in self.total_empty_chair if item['id'] == seat_id), None)
         if totalEmptyChairData != None:
             self.total_empty_chair.remove(totalEmptyChairData)

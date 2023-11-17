@@ -4,6 +4,10 @@ import json
 import argparse
 import math
 import grpc
+import sys
+
+
+from utils.SceneManager import SceneManager
 import GrabSim_pb2_grpc
 import GrabSim_pb2
 
@@ -17,13 +21,27 @@ def generate_data(args):
     stub = GrabSim_pb2_grpc.GrabSimStub(channel)
 
     # DO NOT repeat init
-    print('Please make sure that stub.Init is called only once, otherwise restart the simulator!!!')
-    initworld = stub.Init(GrabSim_pb2.NUL())
-    initworld = stub.SetWorld(GrabSim_pb2.BatchMap(count=1, mapID=args.map_id))
-    msg = stub.Reset(GrabSim_pb2.ResetParams())
-    time.sleep(3)
+    # print('Please make sure that stub.Init is called only once, otherwise restart the simulator!!!')
+    # initworld = stub.Init(GrabSim_pb2.NUL())
+    # initworld = stub.SetWorld(GrabSim_pb2.BatchMap(count=1, mapID=args.map_id))
+    # msg = stub.Reset(GrabSim_pb2.ResetParams())
+    # time.sleep(3)
 
-    scene = stub.Observe(GrabSim_pb2.SceneID(value=0))
+    '''
+    1. 场景生成
+    '''
+    # Create an instance of the SceneManager class
+    scene_manager = SceneManager()
+    map_id = 11  # 地图编号
+    scene_num = 1  # 场景数量
+    print('------------ 初始化加载场景 ------------')
+    scene_manager.Init()
+    scene_manager.AcquireAvailableMaps()
+    scene_manager.SetWorld(map_id, scene_num)
+    time.sleep(5.0)
+    print('------------ 场景操作 ------------')
+    scene_manager.Reset(0)
+    scene = scene_manager.Observe(0)
 
     print(scene)
 
@@ -50,6 +68,10 @@ def generate_data(args):
         if (scene_object.name == "Desk"):
             print(scene_object)
             obj_list.append(scene_object)
+            new_name = "Desk" + str(id)
+            caption_list.append(new_name.lower())
+            cat_ids[new_name] = id
+            id += 1
     # for i in range(len(scene.objects)):
     #     object = scene.objects[i]
     #     name = object.name.strip()
@@ -116,15 +138,11 @@ def generate_data(args):
         item['start_position'] = [g_x, g_y, yaw]
         item['goal'] = {}
         item['goal']['name'] = name
-        item['goal']['cat_id'] = cat_ids[name]
+        # item['goal']['cat_id'] = cat_ids[name]
 
         for i in range(len(scene.objects)):
             object = scene.objects[i]
             o_x, o_y, o_z = object.location.X, object.location.Y, object.location.Z
-            if object.name in ['__UNKNOWN__', 'Ginger', 'Floor', 'Roof', 'Wall', 'Hand', 'Tongs']:
-                continue
-            if 'Room' in name:
-                continue
 
             same_cat = False
             if replace_obj_name is None:
