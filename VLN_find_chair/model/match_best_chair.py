@@ -3,7 +3,7 @@ import os.path
 import numpy as np
 import math
 import json
-from .InquireChairNeeds import InquireChairNeeds
+from InquireChairNeeds import InquireChairNeeds
 from scipy.spatial.distance import hamming
 # 打开JSON文件并加载数据
 
@@ -70,9 +70,9 @@ class ChairList:
         str=""
         parsed_json = json.loads(json_str)
         try:
-            if parsed_json['Location'] == "near window":
+            if  "window" in parsed_json['Location'].lower():
                 str += "01"
-            elif parsed_json['Location'] == "near bar":
+            elif "bar" in parsed_json['Location'].lower():
                 str += "10"
             else:
                 str += "00"
@@ -80,7 +80,7 @@ class ChairList:
             str += "00"
 
         try:
-            if parsed_json['Share'] == "dont want to share":
+            if "dont want" in parsed_json['Share'].lower():
                 str += "1"
             else:
                 str += "0"
@@ -88,9 +88,9 @@ class ChairList:
             str += "0"
 
         try:
-            if parsed_json['Height'] == "high":
+            if "high" in parsed_json['Height'].lower():
                 str += "01"
-            elif parsed_json['Height'] == "low":
+            elif "low" in parsed_json['Height'].lower() :
                 str += "10"
             else:
                 str += "00"
@@ -98,9 +98,9 @@ class ChairList:
             str += "00"
 
         try:
-            if parsed_json['Material'] == "hard":
+            if "hard" in parsed_json['Material'].lower():
                 str += "01"
-            elif parsed_json['Material'] == "soft":
+            elif "soft" in parsed_json['Material'].lower():
                 str += "10"
             else:
                 str += "00"
@@ -209,7 +209,7 @@ class ChairList:
 
 
 if __name__ == '__main__':
-    talk_walker_response = " I'm here alone.I'd like a seat by the firecamp."
+    talk_walker_response = " I'm here alone.I'd like a seat by the window."
     #执行输出
     inquirer = InquireChairNeeds()  # 初始化对话类
 

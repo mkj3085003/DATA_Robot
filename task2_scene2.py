@@ -77,7 +77,7 @@ def detect_customer_proximity(walkers):
 def find_id_by_name(walker_list, name):
     for walker in walker_list:
         if walker['walker'].name == name:
-            return walker.walker_id
+            return walker['walker_id']
     return None  # 如果没有找到，返回Non
 
 
@@ -189,6 +189,7 @@ while True:
         navi.navigate_to_limit(walkers_points[0][0],walkers_points[0][1],0,100,100)
     except:
         navi.navigate_to_limit(points[i%len(points)][0],points[i%len(points)][1], random.randint(0, 360),100,100)
+        time.sleep(5)
         i+=1
         continue
     current_scene = scene_manager.Observe(0)
@@ -201,6 +202,10 @@ while True:
 
     detected_customer = detect_customer_proximity(scene_manager.Observe(0).walkers)
 
+    # #测试行人走
+    # id_walk = find_id_by_name(walker_list, detected_customer.name)
+    # pedestrian_controller.control_one_pedestrian(id_walk, 0,0, 0,
+    #                                              walker_speed=200, scene_id=0)
 
     if detected_customer:
         print(f"Detected customer : {detected_customer}")
@@ -215,10 +220,12 @@ navi.navigate_to_limit(walkers_points[0][0],walkers_points[0][1],yaw,100,100)
 
 # 向顾客问好
 robot_task_controller = RobotTaskController(scene_manager)
-robot_task_controller.display_text_bubble("您好，您需要什么帮助吗？请问几位？对于位置有什么偏好吗？")
-time.sleep(2)
+robot_task_controller.display_text_bubble("Hello! What can I assist you？ How many people do you have? What kind of seats do you want to sit?")
+time.sleep(10)
 talk_walker_response = " I'm here alone.I'd like a seat by the bar."
 pedestrian_controller.talk_walkers(detected_customer.name, talk_walker_response)
+time.sleep(10)
+
 #执行输出
 inquirer = InquireChairNeeds()  # 初始化对话类
 # response = inquirer.initiate_conversation()  # 调用对话函数
@@ -231,7 +238,9 @@ chair = chair_list.find_the_best(ordered_feature)
 print(chair)
 
 #带领
-robot_task_controller.display_text_bubble("好的，这就带您去")
+robot_task_controller.display_text_bubble("Ok! Please follow me!")
+time.sleep(2)
+
 
 navi = NavigationController(scene_manager)
 (navi.navigate_to_limit(chair["position"][0],chair["position"][1],0,200,100))

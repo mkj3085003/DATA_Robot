@@ -137,7 +137,7 @@ class MapBuilder(object):
         cur_point_cloud.points = o3d.utility.Vector3dVector(geocentric_pc)
         cur_point_cloud.colors = o3d.utility.Vector3dVector(point_seg)
         self.seg_pcd_map+=cur_point_cloud
-        self.seg_pcd_map = self.seg_pcd_map.voxel_down_sample(voxel_size=self.resolution)
+        # self.seg_pcd_map = self.seg_pcd_map.voxel_down_sample(voxel_size=self.resolution)
         
 
         # if self.count%5==0:
