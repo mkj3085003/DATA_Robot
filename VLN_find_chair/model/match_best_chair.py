@@ -70,9 +70,9 @@ class ChairList:
         str=""
         parsed_json = json.loads(json_str)
         try:
-            if parsed_json['Location'] == "near window":
+            if  "window" in parsed_json['Location'].lower():
                 str += "01"
-            elif parsed_json['Location'] == "near bar":
+            elif "bar" in parsed_json['Location'].lower():
                 str += "10"
             else:
                 str += "00"
@@ -80,7 +80,7 @@ class ChairList:
             str += "00"
 
         try:
-            if parsed_json['Share'] == "dont want to share":
+            if "dont want" in parsed_json['Share'].lower():
                 str += "1"
             else:
                 str += "0"
@@ -88,9 +88,9 @@ class ChairList:
             str += "0"
 
         try:
-            if parsed_json['Height'] == "high":
+            if "high" in parsed_json['Height'].lower():
                 str += "01"
-            elif parsed_json['Height'] == "low":
+            elif "low" in parsed_json['Height'].lower() :
                 str += "10"
             else:
                 str += "00"
@@ -98,9 +98,9 @@ class ChairList:
             str += "00"
 
         try:
-            if parsed_json['Material'] == "hard":
+            if "hard" in parsed_json['Material'].lower():
                 str += "01"
-            elif parsed_json['Material'] == "soft":
+            elif "soft" in parsed_json['Material'].lower():
                 str += "10"
             else:
                 str += "00"
@@ -146,10 +146,10 @@ class ChairList:
         return self.total_empty_chair
     
     def match_best_chair(self,empty_chairs, demand_feature):
-        min_distance = 7
+        min_distance = 10
         for chair in empty_chairs:
             if chair['Capacity']>= demand_feature['Capacity']: #检查大小
-                dis=hamming(list(chair['feature']),list(demand_feature["Feature"])) * len(chair['feature'])
+                dis=hamming(list(chair['feature']),list(demand_feature["Feature"]))*len(chair['feature'])
                 # 如果不介意，dontmind编码距离减去1
                 if demand_feature["Location"]=="00":
                     dis-1
@@ -165,9 +165,9 @@ class ChairList:
                     best_chair = chair
         return best_chair
     
-    # def hamming_distance(self, str1, str2):
-    #     assert len(str1) == len(str2), "Input strings must have the same length."
-    #     return sum(bit1 != bit2 for bit1, bit2 in zip(str1, str2))
+    def hamming_distance(self, str1, str2):
+        assert len(str1) == len(str2), "Input strings must have the same length."
+        return sum(bit1 != bit2 for bit1, bit2 in zip(str1, str2))
     
     def find_the_best(self,demand_feature_ordered):
         min_distance=7 #7位全不一样
@@ -209,7 +209,7 @@ class ChairList:
 
 
 if __name__ == '__main__':
-    talk_walker_response = " I'm here alone.I'd like a seat by the firecamp."
+    talk_walker_response = " I'm here alone.I'd like a seat by the window."
     #执行输出
     inquirer = InquireChairNeeds()  # 初始化对话类
 
