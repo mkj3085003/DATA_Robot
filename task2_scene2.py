@@ -221,7 +221,7 @@ navi.navigate_to_limit(walkers_points[0][0],walkers_points[0][1],yaw,100,100)
 # 向顾客问好
 robot_task_controller = RobotTaskController(scene_manager)
 robot_task_controller.display_text_bubble("Hello! What can I assist you？ How many people do you have? What kind of seats do you want to sit?")
-time.sleep(10)
+time.sleep(20)
 talk_walker_response = " I'm here alone.I'd like a seat by the bar."
 pedestrian_controller.talk_walkers(detected_customer.name, talk_walker_response)
 time.sleep(10)
@@ -247,7 +247,7 @@ navi = NavigationController(scene_manager)
 # Sleep(1000)
 #更新椅子数目
 chair_list.update_chair_list(chair["id"],ordered_feature["Capacity"])
-time.sleep(5.0)
+time.sleep(1.0)
 #行人走向目标椅子
 yaw = calculate_angle(walkers_points[0][0],walkers_points[0][1],chair["position"][0],chair["position"][1])
 

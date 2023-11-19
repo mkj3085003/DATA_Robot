@@ -1,9 +1,16 @@
 [
     {
+        "id":0,
+        "name": "zhuoziai",
+        "position": [-55,750],
+        "feature":"0100111",
+        "Capacity":4
+    },
+    {
         "id" : 1,
         "name": "zhuoziai",
         "position": [250.0, 1200],
-        "feature":"0100110",
+        "feature":"0000110",
         "Capacity":4
     },
     {
@@ -17,16 +24,10 @@
         "id" : 3,
         "name": "zhuoziai",
         "position": [250.0,1200.0],
-        "feature":"0100111",
+        "feature":"0000111",
         "Capacity":4
     },
-    {
-        "id":4,
-        "name": "zhuoziai",
-        "position": [-55,750],
-        "feature":"0100111",
-        "Capacity":4
-    },
+
     {
         "id":5,
         "name": "zhuozibar",
@@ -35,18 +36,18 @@
         "Capacity":2
     },
     {
+        "id": 0,
+        "name": "zhuozichuangbianlianzuo",
+        "position": [-280, 420],
+        "feature": "0100111",
+        "Capacity": 6
+    },
+    {
         "id":6,
         "name": "zhuoziai",
         "position": [100,1050],
         "feature":"0100111",
         "Capacity":4
-    },
-        {
-        "id": 7,
-        "name": "zhuoziai",
-        "position": [100, 1050],
-        "feature": "0100111",
-        "Capacity": 4
     },
     {
         "id": 8,
@@ -67,13 +68,6 @@
         "name": "zhuozichuangbiandanzuo",
         "position": [-300, 350],
         "feature": "0000111",
-        "Capacity": 6
-    },
-    {
-        "id": 11,
-        "name": "zhuozichuangbianlianzuo",
-        "position": [-280, 420],
-        "feature": "0100111",
         "Capacity": 6
     },
     {

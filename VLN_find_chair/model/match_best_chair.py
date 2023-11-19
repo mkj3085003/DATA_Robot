@@ -3,7 +3,7 @@ import os.path
 import numpy as np
 import math
 import json
-from InquireChairNeeds import InquireChairNeeds
+from .InquireChairNeeds import InquireChairNeeds
 from scipy.spatial.distance import hamming
 # 打开JSON文件并加载数据
 
