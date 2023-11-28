@@ -141,6 +141,7 @@ def remove_pcd_by_id(pcd,remove_list=[251,254,253]):# floor roof wall ginger
 
 
 
+
 def cluster_and_get_center(pcd, eps, min_points,vis=False):
     # 使用DBSCAN进行点云密度聚类
     labels = np.array(pcd.cluster_dbscan(eps=eps, min_points=min_points, print_progress=False))

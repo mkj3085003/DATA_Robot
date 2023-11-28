@@ -42,7 +42,7 @@ def get_args():
     parser.add_argument('--vision_range', type=int, default=600)
     parser.add_argument('--resolution', type=int, default=5)
     parser.add_argument('--du_scale', type=int, default=1)
-    parser.add_argument('--map_size_cm', type=int, default=2400)
+    parser.add_argument('--map_size_cm', type=int, default=2500)
     #相机俯仰角
     parser.add_argument('--agent_view_angle',type=float, default=-12.0)
 
@@ -77,7 +77,6 @@ def get_obs(stub):
 def navigate():
     time.sleep(5)
     navigator = NavigationController(scene_manager)
-
     
     result_scene = navigator.navigate_to_limit(247, -10,270,100,100)
     
@@ -116,9 +115,13 @@ def vis_map(plt,map2d,pose):
     plt.pause(0.005)
 
 
+
+
+
+
 def add_walkers(sim_client,scene_id = 0):
     print('------------------add_walkers----------------------')
-    walker_loc = [[0, 880], [250, 1200],[-50,500], [-55, 750], [70, -200]]
+    walker_loc = [[0, 880], [150, 1400],[-50,500], [-55, 750]]      # [70, -200]
     walker_list = []
     for i in range(len(walker_loc)):
         loc = walker_loc[i] + [0, 0, 100]
@@ -157,7 +160,8 @@ if __name__ == '__main__':
     # camera.show_image(camera.capture_image(GrabSim_pb2.CameraName.Head_Segment,0))
 
     mapbuilder=MapBuilder(args)
-
+    poses=np.array(scene_manager.get_pose_XYRad())
+    # mapbuilder.getViewMap(poses[0],poses[1],poses[2])
     # locs=mapbuilder.get_walkers_loc(scene_manager)
     # print(locs)
     # sys.exit()
