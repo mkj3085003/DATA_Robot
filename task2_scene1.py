@@ -161,8 +161,8 @@ while True:
 
 # 向顾客问好
 robot_task_controller = RobotTaskController(scene_manager)
-robot_task_controller.display_text_bubble("您好，您需要什么帮助吗？请问几位？对于位置有什么偏好吗？")
-time.sleep(2)
+robot_task_controller.display_text_bubble("Hello! What can I assist you？ How many people do you have? What kind of seats do you want to sit?")
+time.sleep(20)
 talk_walker_response = " I'm here alone.I'd like a seat by the window."
 pedestrian_controller.talk_walkers(detected_customer.name, talk_walker_response)
 #执行输出
@@ -176,14 +176,15 @@ chair = chair_list.find_the_best(ordered_feature)
 print(chair)
 
 #带领
-robot_task_controller.display_text_bubble("好的，这就带您去")
-
+time.sleep(10)
+robot_task_controller.display_text_bubble("Ok! Please follow me.")
+# time.sleep(5)
 navi = NavigationController(scene_manager)
 print(navi.navigate_to_limit(chair["position"][0],chair["position"][1],end_yaw,200,100))
 # Sleep(1000)
 #更新椅子数目
 chair_list.update_chair_list(chair["id"],ordered_feature["Capacity"])
-time.sleep(5.0)
+time.sleep(2.0)
 #行人走向目标椅子
 pedestrian_controller.control_one_pedestrian(walker_id,chair["position"][0],chair["position"][1],end_yaw, walker_speed=200, scene_id=0)
 #机器人回来等待下一个顾客
