@@ -84,7 +84,12 @@ class MapBuilder(object):
         if len(cluster_centers)==0:
             return np.array([])
         return cluster_centers[:,[0,2]]
-
+    def is_angle_between(self,t, t1, t2):
+        # 将角度 t 调整到 [-pi, pi] 范围内
+        if t1 <= t2:
+            return t1 <= t <= t2
+        else:
+            return t >= t1 or t <= t2
     def getViewMap(self,x,y,yaw):
 
         maxDepth = self.vision_range//self.resolution  # 最大观测深度
@@ -93,11 +98,13 @@ class MapBuilder(object):
 
         yaw_rad = yaw 
         fov_rad = np.radians(self.fov)
-        print((yaw_rad,fov_rad))
+        # print((yaw_rad,fov_rad))
 
         # 扇形区域的角度范围
-        start_angle = yaw_rad - fov_rad / 2
-        end_angle = yaw_rad + fov_rad / 2
+        start_angle = self.map2Range(yaw_rad - fov_rad / 2)
+        end_angle =self.map2Range(yaw_rad + fov_rad / 2)
+   
+        
         # 确定正方形边界
         square_size = 2 * maxDepth  # 正方形边界大小为最大观测深度的两倍
         min_i = max(0, ix - square_size // 2)
@@ -113,15 +120,10 @@ class MapBuilder(object):
                 distance_to_point_2 = (i - ix) ** 2 + (j - iy) ** 2
 
                 # 判断当前位置是否在相机视野范围内且在最大观测深度内
-                if start_angle <= angle_to_point <= end_angle and distance_to_point_2 <= maxDepth**2:
+                if self.is_angle_between(angle_to_point,start_angle,end_angle) and distance_to_point_2 <= maxDepth**2:
                     viewMap[i, j] = 1  # 观测到的区域标记为1（或者你需要的其他数值）
 
-        plt.imshow(viewMap, cmap='gray')
-        plt.title('Visualization of ViewMap')
-        plt.colorbar(label='Observability')
-        plt.xlabel('X-axis')
-        plt.ylabel('Y-axis')
-        plt.show()
+
         return viewMap
 
 
@@ -156,7 +158,13 @@ class MapBuilder(object):
                 grid_map[grid_x, grid_y] += 1
         return grid_map
 
-
+    def map2Range(self,radians):
+        while radians < -np.pi:
+            radians += 2 * np.pi
+        while radians >= np.pi:
+            radians -= 2 * np.pi
+        return radians
+        
     def update_map(self,seg, depth, current_pose):
        
 
@@ -181,27 +189,25 @@ class MapBuilder(object):
         # self.seg_pcd_map = self.seg_pcd_map.voxel_down_sample(voxel_size=self.resolution)
         
 
-        # if self.count%5==0:
-        #     o3d.visualization.draw_geometries([self.seg_pcd_map])
-        # self.count+=1
-
-        
 
 
         cur_grid_map=self.to_2d_grid_map(geocentric_pc,self.agent_min_z,self.agent_max_z)
 
-        # vmap=self.getViewMap(current_pose[0],current_pose[1],current_pose[2])
-        # free_mask = vmap&(cur_grid_map<=1)
-        # occ_mask = vmap&(cur_grid_map>1)
+        vmap=self.getViewMap(current_pose[0],current_pose[1],current_pose[2])
+        free_mask = (vmap==1) & (cur_grid_map<=1)
+        occ_mask = (vmap==1) & (cur_grid_map>1)
 
-        # # Adjust the cells appropriately
-        # self.log_prob_map[occ_mask] += self.l_occ
-        # self.log_prob_map[free_mask] += self.l_free
 
+        # Adjust the cells appropriately
+        self.log_prob_map[occ_mask] += self.l_occ
+        self.log_prob_map[free_mask] += self.l_free
+        
+        # plt.imshow(1.0 - 1./(1.+np.exp(self.log_prob_map)), 'Greys')
+        # plt.show()
         # cur_grid_map=np.where(cur_grid_map>0,max(cur_grid_map-4,0),0)
+
         self.map = self.map + cur_grid_map
-
-
+        
         return self.map
 
 

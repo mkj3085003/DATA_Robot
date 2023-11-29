@@ -115,7 +115,17 @@ def vis_map(plt,map2d,pose):
     plt.pause(0.005)
 
 
+def vis_log_prob_map(plt,log_prob_map,pose):
+    plt.clf()
+    plt.imshow(1.0 - 1./(1.+np.exp(log_prob_map)), 'Greys')
+    plt.colorbar(label='Observability')
+    circle = plt.Circle((pose[1], pose[0]), radius=10.0,color="blue", fill=True)
+    plt.gca().add_patch(circle)
 
+    arrow = pose[0:2] + np.array([35, 0]).dot(np.array([[np.cos(pose[2]), np.sin(pose[2])], [-np.sin(pose[2]), np.cos(pose[2])]]))
+    plt.plot([pose[1], arrow[1]], [pose[0], arrow[0]])
+
+    plt.pause(0.005)
 
 
 
@@ -183,7 +193,8 @@ if __name__ == '__main__':
         depth = np.where(depth >= 599.0, 0.0, depth)
         mp=mapbuilder.update_map(seg,depth,poses)
         x,y=mapbuilder.pos_to_index(poses[0],poses[1])
-        vis_map(plt,mp,(x,y,poses[2]))
+        # vis_map(plt,mp,(x,y,poses[2]))
+        vis_log_prob_map(plt,mapbuilder.log_prob_map,(x,y,poses[2]))
     
 
     o3d.visualization.draw_geometries([mapbuilder.seg_pcd_map])
